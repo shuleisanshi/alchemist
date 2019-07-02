@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="WARN" monitorInterval="1800">
+    <properties>
+        <property name="UNKNOWN" value="????"/>
+        <property name="server_name" value="${spring:spring.application.name}"/>
+        <property name="log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | ${server_name} | %X{IP} | %logger{1} | %thread -> %class{1}#%method:%line | %msg{nolookups}%n%xwEx"/>
+
+        <property name="basePath">./log4j2Logs/${server_name}</property>
+        <property name="every_file_size">20MB</property>
+        <property name="output_log_level">INFO</property>
+
+        <property name="rolling_fileName">${basePath}/all.log</property>
+        <property name="rolling_filePattern">${basePath}/%d{yyyy-MM}/all-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="rolling_max">20</property>
+
+        <property name="error_fileName">${basePath}/error.log</property>
+        <property name="error_filePattern">${basePath}/%d{yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz</property>
+        <property name="error_max">10</property>
+
+        <property name="console_print_level">INFO</property>
+    </properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <ThresholdFilter level="${console_print_level}" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+        </Console>
+
+        <RollingRandomAccessFile name="RollingFile" fileName="${rolling_fileName}" filePattern="${rolling_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <SizeBasedTriggeringPolicy size="${every_file_size}"/>
+            <DefaultRolloverStrategy max="${rolling_max}" />
+            <Filters>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="ErrorFile" fileName="${error_fileName}" filePattern="${error_filePattern}">
+            <PatternLayout pattern="${log_pattern}" charset="UTF-8"/>
+            <SizeBasedTriggeringPolicy size="${every_file_size}" />
+            <DefaultRolloverStrategy max="${error_max}" />
+            <Filters>
+                <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info" includeLocation="true">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Root>
+    </Loggers>
+</configuration>

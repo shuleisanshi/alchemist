@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "youngboss.dlock.enable",
+      "type": "java.lang.Boolean",
+      "description": "Description for youngboss.dlock.enable."
+    }
+  ]
+}

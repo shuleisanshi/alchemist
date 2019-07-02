@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: example
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    #连接超时时间
+    timeout: 10s
+    lettuce:
+      pool:
+        #最大连接数
+        max-active: 35
+        #最大阻塞等待时间(负数表示没限制)
+        max-wait: 5s
+        #最大空闲
+        max-idle: 16
+        #最小空闲
+        min-idle: 0
+
+
+youngboss:
+  ccmvc:
+    oplog: true
+    disruptor:
+      power: 11
+      worker: 2
+  redisoper:
+    serialize-type: protostuff
+    orm-type: none
+    dlock:
+      enable: true
+      dLockType: redisson
+  ccauth:
+    enable-jwt-session: true
+    local-session-cache-maximum-size: 50000
+    local-session-expire-second: 300

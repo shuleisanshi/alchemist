@@ -1,0 +1,25 @@
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    #连接超时时间
+    timeout: 10s
+    lettuce:
+      pool:
+        #最大连接数
+        max-active: 5
+        #最大阻塞等待时间(负数表示没限制)
+        max-wait: 5s
+        #最大空闲
+        max-idle: 1
+        #最小空闲
+        min-idle: 0
+
+
+youngboss:
+  redisoper:
+    serialize-type: protostuff
+    orm-type: none
+    dlock:
+      dLockType: redisson
+      enable: true

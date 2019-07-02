@@ -1,0 +1,9 @@
+youngboss:
+  ccmvc:
+    oplog: true
+    disruptor:
+      power: 11
+      worker: 2
+spring:
+  application:
+    name: cc-mvc

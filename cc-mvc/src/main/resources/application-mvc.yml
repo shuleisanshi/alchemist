@@ -1,0 +1,8 @@
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+
+logging:
+  config: classpath:log4j2.xml
