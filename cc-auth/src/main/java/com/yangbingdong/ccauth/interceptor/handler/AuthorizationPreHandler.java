@@ -11,5 +11,9 @@ import java.lang.reflect.Method;
  */
 public interface AuthorizationPreHandler {
 
+	/**
+	 * you can put user info hear, or do other logic.
+	 * invoke by {@link AbstractJwtAuthorizationPreHandler#preHandleAuth(HttpServletRequest, HttpServletResponse, Method)}
+	 */
 	void preHandleAuth(HttpServletRequest request, HttpServletResponse response, Method method);
 }
