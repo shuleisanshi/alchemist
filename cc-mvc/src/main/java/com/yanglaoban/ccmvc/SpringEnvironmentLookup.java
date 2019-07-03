@@ -6,8 +6,10 @@ import org.apache.logging.log4j.core.lookup.AbstractLookup;
 import org.apache.logging.log4j.core.lookup.StrLookup;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.Assert;
+import org.springframework.util.ResourceUtils;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,8 +39,8 @@ public class SpringEnvironmentLookup extends AbstractLookup {
 	private static final String SPRING_PROFILES_ACTIVE = "spring.profiles.active";
 
 	static {
-		try {
-			metaYmlData = new Yaml().loadAs(new ClassPathResource(META_PROFILE).getInputStream(), LinkedHashMap.class);
+		try (FileInputStream fi = new FileInputStream(ResourceUtils.getFile("classpath:" + META_PROFILE))) {
+			metaYmlData = new Yaml().loadAs(fi, LinkedHashMap.class);
 			Properties properties = System.getProperties();
 			String active = properties.getProperty(SPRING_PROFILES_ACTIVE);
 			if (isBlank(active)) {
@@ -53,7 +55,6 @@ public class SpringEnvironmentLookup extends AbstractLookup {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new RuntimeException("SpringEnvironmentLookup initialize fail");
 		}
 	}
