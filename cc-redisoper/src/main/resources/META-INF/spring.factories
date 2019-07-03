@@ -1,3 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.youngboss.ccredisoper.config.RedisoperAutoConfiguration,\
-  com.youngboss.ccredisoper.extend.dlock.config.DLockAutoConfiguration
+  com.youngbingdong.ccredisoper.config.RedisoperAutoConfiguration,\
+  com.youngbingdong.ccredisoper.extend.dlock.config.DLockAutoConfiguration

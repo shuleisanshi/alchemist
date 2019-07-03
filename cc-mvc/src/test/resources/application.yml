@@ -1,4 +1,4 @@
-youngboss:
+cc:
   ccmvc:
     oplog: true
     disruptor:

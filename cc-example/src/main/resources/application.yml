@@ -19,7 +19,7 @@ spring:
         min-idle: 0
 
 
-youngboss:
+cc:
   ccmvc:
     oplog: true
     disruptor:

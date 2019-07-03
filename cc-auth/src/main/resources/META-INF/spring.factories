@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.yanglaoban.ccauth.config.CcAuthAutoConfiguration
+  com.yangbingdong.ccauth.config.CcAuthAutoConfiguration

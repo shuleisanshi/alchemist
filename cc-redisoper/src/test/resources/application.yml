@@ -16,7 +16,7 @@ spring:
         min-idle: 0
 
 
-youngboss:
+cc:
   redisoper:
     serialize-type: protostuff
     orm-type: none

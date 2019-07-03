@@ -1,9 +1,9 @@
 org.springframework.boot.SpringApplicationRunListener=\
-  com.yanglaoban.ccmvc.config.MvcProfileIncludeInitializer
+  com.yangbingdong.ccmvc.config.MvcProfileIncludeInitializer
 
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.yanglaoban.ccmvc.annotated.GlobalControllerAdvisor,\
-  com.yanglaoban.ccmvc.config.CcMvcAutoConfiguration,\
-  com.yanglaoban.ccmvc.config.OpLogConfiguration,\
-  com.yanglaoban.ccmvc.exception.GlobalExceptionHandler,\
-  com.yanglaoban.ccmvc.config.GracefulShutdownAutoConfiguration
+  com.yangbingdong.ccmvc.annotated.GlobalControllerAdvisor,\
+  com.yangbingdong.ccmvc.config.CcMvcAutoConfiguration,\
+  com.yangbingdong.ccmvc.config.OpLogConfiguration,\
+  com.yangbingdong.ccmvc.exception.GlobalExceptionHandler,\
+  com.yangbingdong.ccmvc.config.GracefulShutdownAutoConfiguration
