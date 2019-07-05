@@ -4,6 +4,7 @@ import com.youngbingdong.ccredisoper.CcRedisoperApplicationTests;
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.junit.ContiPerfRule;
 import org.junit.AfterClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.LongAdder;
  * @date 19-5-16
  * @contact yangbingdong1994@gmail.com
  */
+@Ignore
 public class DLockTest extends CcRedisoperApplicationTests {
 	@Rule
 	public ContiPerfRule i = new ContiPerfRule();

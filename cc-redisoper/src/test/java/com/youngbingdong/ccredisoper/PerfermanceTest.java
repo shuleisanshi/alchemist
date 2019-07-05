@@ -4,6 +4,7 @@ import com.youngbingdong.ccredisoper.core.UserService;
 import com.youngbingdong.ccredisoper.vo.TestUser;
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.junit.ContiPerfRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @date 19-3-22
  * @contact yangbingdong1994@gmail.com
  */
+@Ignore
 public class PerfermanceTest extends CcRedisoperApplicationTests {
 
 	@Rule

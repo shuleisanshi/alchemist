@@ -25,7 +25,7 @@
     <properties>
         <project.version>0.0.1-SNAPSHOT</project.version>
 
-        <maven.test.skip>true</maven.test.skip>
+        <!--<maven.test.skip>true</maven.test.skip>-->
         <java.version>1.8</java.version>
         <commons-lang3.version>3.7</commons-lang3.version>
         <commons-collections4.version>4.1</commons-collections4.version>
