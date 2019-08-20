@@ -1,5 +1,5 @@
-cc:
-  ccmvc:
+alchemist:
+  mvc:
     oplog: true
     disruptor:
       power: 11

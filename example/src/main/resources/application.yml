@@ -19,8 +19,8 @@ spring:
         min-idle: 0
 
 
-cc:
-  ccmvc:
+alchemist:
+  mvc:
     oplog: true
     disruptor:
       power: 11
@@ -31,7 +31,7 @@ cc:
     dlock:
       enable: true
       dLockType: redisson
-  ccauth:
+  auth:
     enable-jwt-session: true
     local-session-cache-maximum-size: 50000
     local-session-expire-second: 300

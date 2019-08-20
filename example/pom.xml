@@ -11,7 +11,7 @@
     <groupId>com.yanglaoban</groupId>
     <artifactId>example</artifactId>
     <name>example</name>
-    <description>Demo project for cc component</description>
+    <description>Demo project for Alchemist</description>
 
     <properties>
         <java.version>1.8</java.version>

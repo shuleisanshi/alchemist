@@ -16,7 +16,7 @@ spring:
         min-idle: 0
 
 
-cc:
+alchemist:
   redisoper:
     serialize-type: protostuff
     orm-type: none

@@ -36,7 +36,7 @@
                 <artifactId>gatling-maven-plugin</artifactId>
                 <version>${gatling-plugin.version}</version>
                 <configuration>
-                    <simulationClass>com.yanglaoban.ccgatling.ExampleGatlingTester</simulationClass>
+                    <simulationClass>com.yanglaoban.gatling.ExampleGatlingTester</simulationClass>
                     <resultsFolder>${project.build.directory}/test</resultsFolder>
                 </configuration>
                 <executions>
