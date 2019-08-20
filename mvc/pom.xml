@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yangbingdong</groupId>
-        <artifactId>cc-component</artifactId>
+        <artifactId>alchemist</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>cc-mvc</artifactId>
-    <name>cc-mvc</name>
+    <artifactId>mvc</artifactId>
+    <name>mvc</name>
     <description>MVC Config</description>
 
     <properties>
@@ -87,7 +87,7 @@
 
         <dependency>
             <groupId>com.yangbingdong</groupId>
-            <artifactId>cc-util</artifactId>
+            <artifactId>util</artifactId>
         </dependency>
 
         <dependency>

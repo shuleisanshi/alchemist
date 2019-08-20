@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yangbingdong</groupId>
-        <artifactId>cc-component</artifactId>
+        <artifactId>alchemist</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>cc-auth</artifactId>
-    <name>cc-auth</name>
+    <artifactId>auth</artifactId>
+    <name>auth</name>
     <description>Authorization Module</description>
 
     <properties>
@@ -44,7 +44,7 @@
 
         <dependency>
             <groupId>com.yangbingdong</groupId>
-            <artifactId>cc-redisoper</artifactId>
+            <artifactId>redisoper</artifactId>
             <optional>true</optional>
         </dependency>
     </dependencies>

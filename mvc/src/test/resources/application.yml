@@ -6,4 +6,4 @@ cc:
       worker: 2
 spring:
   application:
-    name: cc-mvc
+    name: mvc

@@ -5,21 +5,21 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.0.M4</version>
+        <version>2.2.0.M5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.yangbingdong</groupId>
-    <artifactId>cc-component</artifactId>
+    <artifactId>alchemist</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>cc-component</name>
+    <name>alchemist</name>
     <description>Central City Component</description>
     <packaging>pom</packaging>
 
     <modules>
-        <module>cc-util</module>
-        <module>cc-redisoper</module>
-        <module>cc-mvc</module>
-        <module>cc-auth</module>
+        <module>util</module>
+        <module>redisoper</module>
+        <module>mvc</module>
+        <module>auth</module>
     </modules>
 
     <properties>
@@ -82,22 +82,22 @@
         <dependencies>
             <dependency>
                 <groupId>com.yangbingdong</groupId>
-                <artifactId>cc-util</artifactId>
+                <artifactId>util</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.yangbingdong</groupId>
-                <artifactId>cc-redisoper</artifactId>
+                <artifactId>redisoper</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.yangbingdong</groupId>
-                <artifactId>cc-mvc</artifactId>
+                <artifactId>mvc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.yangbingdong</groupId>
-                <artifactId>cc-auth</artifactId>
+                <artifactId>auth</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
@@ -107,22 +107,26 @@
         <repository>
             <id>nexus-releases</id>
             <name>Nexus Release Repository</name>
-            <url>http://58.63.50.226:8081/repository/maven-releases/</url>
+            <url>http://127.0.0.1:9091/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
             <id>nexus-snapshots</id>
             <name>Nexus Snapshot Repository</name>
-            <url>http://58.63.50.226:8081/repository/maven-snapshots/</url>
+            <url>http://127.0.0.1:9091/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
     <repositories>
         <repository>
-            <id>nexus</id>
-            <name>Team Nexus Repository</name>
-            <url>http://58.63.50.226:8081/repository/maven-public/</url>
+            <id>spring</id>
+            <url>https://maven.aliyun.com/repository/spring</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
-
         <repository>
             <id>spring-snapshots</id>
             <name>Spring Snapshots</name>

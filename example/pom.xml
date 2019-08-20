@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yangbingdong</groupId>
-        <artifactId>cc-component</artifactId>
+        <artifactId>alchemist</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>com.yanglaoban</groupId>
-    <artifactId>cc-example</artifactId>
-    <name>cc-example</name>
+    <artifactId>example</artifactId>
+    <name>example</name>
     <description>Demo project for cc component</description>
 
     <properties>
@@ -20,17 +20,17 @@
     <dependencies>
         <dependency>
             <groupId>com.yangbingdong</groupId>
-            <artifactId>cc-mvc</artifactId>
+            <artifactId>mvc</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.yangbingdong</groupId>
-            <artifactId>cc-redisoper</artifactId>
+            <artifactId>redisoper</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.yangbingdong</groupId>
-            <artifactId>cc-auth</artifactId>
+            <artifactId>auth</artifactId>
         </dependency>
 
         <dependency>
