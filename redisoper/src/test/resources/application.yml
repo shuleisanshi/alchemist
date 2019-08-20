@@ -23,3 +23,13 @@ alchemist:
     dlock:
       dLockType: redisson
       enable: true
+    locator:
+      enable: true
+      type: tencent
+      key: JVBBZ-DCPK3-6G33L-36QAM-YEQC5-WCBZQ
+      sign: DHwOuC0wNVRBxIIQzfcubDBi67BxgeUp
+
+#locator:
+#  type: gaode
+#  key: 96082be8ca6d5e3f6983bcf402c7117b
+#  sign: 26a410713aa0f6f25be985eac5b52beb

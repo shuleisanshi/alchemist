@@ -38,6 +38,28 @@
         </dependency>
         <!-- ######################### JWT End ############################ -->
 
+        <!-- 读取 CVS -->
+        <!-- http://opencsv.sourceforge.net/ -->
+        <!-- https://www.baeldung.com/opencsv -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.6</version>
+        </dependency>
+
+        <!-- 高性能Http通信框架 -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>4.6.1</version>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -1,5 +1,6 @@
 package com.youngbingdong.util.perf;
 
+import cn.hutool.core.util.StrUtil;
 import com.youngbingdong.util.PlaceHolderParser;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -14,7 +15,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,15 +34,20 @@ public class PlaceHolderPerfTest {
 	private static final String tmp = "{}-{}";
 	private static final Object[] args = new Object[]{"first", "second"};
 
-	@Benchmark
+/*	@Benchmark
 	public String javaReplace() {
 		return MessageFormat.format(java_tmp, args);
-	}
+	}*/
 
 	@Benchmark
 	public String replace() {
 		return PlaceHolderParser.parse(tmp, args);
 	}
+
+    @Benchmark
+    public String hutoolReplace() {
+        return StrUtil.format(tmp, args);
+    }
 
 	public static void main(String[] args) throws RunnerException {
 		Options options = new OptionsBuilder().include(PlaceHolderPerfTest.class.getSimpleName())
