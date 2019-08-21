@@ -3,6 +3,7 @@ package com.yangbingdong.mvc.mvc;
 import com.yangbingdong.mvc.annotated.Rest;
 import com.yangbingdong.mvc.log.core.OpLog;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * @author ybd
@@ -13,9 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HelloController {
 
 	@OpLog("SayHello")
-	@GetMapping("/hello")
-	public void sayHello() {
-		System.out.println("####### Hello World!");
+	@GetMapping(value = "/hello/{name}", name = "helloWorld")
+	public void sayHello(@PathVariable String name) {
+		System.out.println("####### Hello World! Your name is " + name);
 	}
 
 	@GetMapping("/error")

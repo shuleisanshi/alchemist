@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.UnsupportedEncodingException;
 
+import static com.yangbingdong.mvc.enhance.EnhanceRequestMappingHandlerMapping.X_INNER_ACTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,7 +31,7 @@ public class HelloControllerTest extends MvcApplicationTests {
 
 	@Test
 	public void helloTestUsingMockMvc() throws Exception {
-		MvcResult mvcResult = mockMvc.perform(get("/hello").accept(APPLICATION_JSON))
+		MvcResult mvcResult = mockMvc.perform(get("/hello/yangbingdong").accept(APPLICATION_JSON).header(X_INNER_ACTION, "helloWorld"))
 									 .andExpect(status().isOk())
 									 .andReturn();
 		Response response = extractResponse(mvcResult);

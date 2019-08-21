@@ -1,5 +1,6 @@
 package com.yangbingdong.mvc.config;
 
+import com.yangbingdong.mvc.enhance.EnhanceWebMvcConfigurationSupport;
 import com.yangbingdong.mvc.filter.MDCCleanFilter;
 import com.yangbingdong.mvc.interceptor.IpInterceptor;
 import com.yangbingdong.mvc.mvcconfigurer.FastJsonConverterWebMvcConfigurer;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 /**
  * @author ybd
@@ -37,6 +39,11 @@ public class MvcAutoConfiguration {
 		registrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
 		return registrationBean;
 	}
+
+    @Bean
+    public WebMvcConfigurationSupport webMvcConfigurationSupport() {
+        return new EnhanceWebMvcConfigurationSupport();
+    }
 
 
 }

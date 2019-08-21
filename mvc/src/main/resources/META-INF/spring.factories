@@ -1,6 +1,5 @@
 org.springframework.boot.SpringApplicationRunListener=\
   com.yangbingdong.mvc.config.MvcProfileIncludeInitializer
-
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.yangbingdong.mvc.annotated.GlobalControllerAdvisor,\
   com.yangbingdong.mvc.config.MvcAutoConfiguration,\
