@@ -5,7 +5,9 @@ import org.springframework.util.Assert;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.Map;
 
+import static cn.hutool.core.bean.BeanUtil.beanToMap;
 import static org.springframework.beans.BeanUtils.getPropertyDescriptors;
 
 /**
@@ -40,4 +42,8 @@ public class BeanUtil {
 			}
 		}
 	}
+
+    public static Map<String, Object> toMap(Object bean) {
+        return beanToMap(bean, false, true);
+    }
 }

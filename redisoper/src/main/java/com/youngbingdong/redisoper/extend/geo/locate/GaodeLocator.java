@@ -3,9 +3,11 @@ package com.youngbingdong.redisoper.extend.geo.locate;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.youngbingdong.redisoper.extend.geo.config.LocatorProperty;
-import com.youngbingdong.util.http.OkHttpUtil;
+import com.youngbingdong.util.http.ApiRequest;
+import com.youngbingdong.util.http.HttpAccessor;
 import lombok.extern.slf4j.Slf4j;
 
+import static com.youngbingdong.util.http.ApiRequest.newRequest;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -33,8 +35,8 @@ public class GaodeLocator implements Locator {
     public LngLatPair locate(String address) {
         String realParam = String.format(PARAM, address, key);
         String signMd5 = SecureUtil.md5(realParam + sign);
-        String body = OkHttpUtil.get(URL + realParam + "&sig=" + signMd5);
-        JSONObject json = JSONObject.parseObject(body);
+        ApiRequest<JSONObject> request = newRequest(URL + realParam + "&sig=" + signMd5, JSONObject.class);
+        JSONObject json = HttpAccessor.send(request);
         String status = (String) json.getOrDefault("status", "-1");
         if (!"1".equals(status)) {
             log.error("获取失败 -> " + address);

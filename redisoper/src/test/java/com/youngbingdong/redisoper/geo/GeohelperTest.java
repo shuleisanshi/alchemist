@@ -87,7 +87,6 @@ public class GeohelperTest extends RedisoperApplicationTests {
      * 广东省广州市丰兴广场A坐: lng=113.33316, lat=23.13295
      */
     @Test
-    @Ignore
     public void locatorTest() {
         LngLatPair lngLatPair = locator.locate(MEMBER);
         log.info("{}", lngLatPair);
