@@ -33,9 +33,13 @@ public class OkHttpUtil {
         okHttpClient = builder.build();
     }
 
-    public static String get(String uri) {
+    public static OkHttpClient getHttpClient() {
+        return okHttpClient;
+    }
+
+    public static String get(String url) {
         try (Response response = okHttpClient.newCall(new Request.Builder().get()
-                                                                           .url(uri)
+                                                                           .url(url)
                                                                            .build()).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
