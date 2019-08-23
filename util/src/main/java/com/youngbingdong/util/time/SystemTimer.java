@@ -2,6 +2,7 @@ package com.youngbingdong.util.time;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.concurrent.locks.LockSupport;
 
 import static java.time.Instant.ofEpochMilli;
@@ -16,7 +17,18 @@ public final class SystemTimer {
 	private static final SystemTimer INSTANCE = new SystemTimer();
 
 	private long now = System.currentTimeMillis();
-	private LocalDateTime localDateTime = LocalDateTime.ofInstant(ofEpochMilli(now), SYSTEM_DEFAULT_ZONE);
+
+    public static long now() {
+        return INSTANCE.currentTimeMillis();
+    }
+
+    public static LocalDateTime nowDateTime() {
+        return INSTANCE.currentLocalDateTime();
+    }
+
+    public static Date nowDate() {
+        return INSTANCE.currentDate();
+    }
 
 	private SystemTimer() {
 		Thread updater = new Thread("SystemTimer Updater Thread") {
@@ -25,7 +37,6 @@ public final class SystemTimer {
 			public void run() {
 				while (true) {
 					now = System.currentTimeMillis();
-					localDateTime = LocalDateTime.ofInstant(ofEpochMilli(now), SYSTEM_DEFAULT_ZONE);
 					LockSupport.parkNanos(1000_000);
 				}
 			}
@@ -34,19 +45,15 @@ public final class SystemTimer {
 		updater.start();
 	}
 
-	public static long now() {
-		return INSTANCE.currentTimeMillis();
-	}
-
 	private long currentTimeMillis() {
 		return now;
 	}
 
 	private LocalDateTime currentLocalDateTime() {
-		return localDateTime;
+		return LocalDateTime.ofInstant(ofEpochMilli(now), SYSTEM_DEFAULT_ZONE);
 	}
 
-	public static LocalDateTime nowDateTime() {
-		return INSTANCE.currentLocalDateTime();
-	}
+    private Date currentDate() {
+        return new Date(now);
+    }
 }

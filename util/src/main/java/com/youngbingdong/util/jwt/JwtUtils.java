@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -29,7 +30,12 @@ public class JwtUtils {
 	private static final Key SECRET_KEY = new SecretKeySpec("PRIVATE_ccec6faa-ad93-45f7-ac8e-1feb148dce92".getBytes(), SIGNATURE_ALGORITHM.getJcaName());
 	private static final Serializer<Map<String, ?>> SERIALIZER = new FastJwtSerializer();
 	private static final Deserializer<Map<String, ?>> DESERIALIZER = new FastJwtDeserializer();
-	private static final String BEARER = "Bearer ";
+    private static final JwtParser JWT_PARSER = Jwts.parser()
+                                                    .setClock(SystemTimer::nowDate)
+                                                    .deserializeJsonWith(DESERIALIZER)
+                                                    .setSigningKey(SECRET_KEY)
+                                                    .setAllowedClockSkewSeconds(10);
+    private static final String BEARER = "Bearer ";
 	private static final int TOKEN_PREFIX_LENGTH = BEARER.length();
 
 
@@ -41,11 +47,7 @@ public class JwtUtils {
 		if (ttlMillis > 0) {
 			jwtBuilder.setExpiration(new Date(SystemTimer.now() + ttlMillis));
 		}
-		return jwtBuilder.compact();
-	}
-
-	public static String genJwtTokenHeader(String jwt) {
-		return BEARER + jwt;
+		return BEARER + jwtBuilder.compact();
 	}
 
 	public static boolean validTokenPrefix(String token) {
@@ -54,11 +56,7 @@ public class JwtUtils {
 
 	public static Jws<Claims> parseJwt(String token) {
 		try {
-			return Jwts.parser()
-					   .deserializeJsonWith(DESERIALIZER)
-					   .setSigningKey(SECRET_KEY)
-					   .setAllowedClockSkewSeconds(10)
-					   .parseClaimsJws(token.substring(TOKEN_PREFIX_LENGTH));
+			return JWT_PARSER.parseClaimsJws(token.substring(TOKEN_PREFIX_LENGTH));
 		} catch (ExpiredJwtException e) {
 			throw new TokenException("Token已过期");
 		} catch (UnsupportedJwtException e) {
@@ -73,7 +71,7 @@ public class JwtUtils {
 	}
 
 	public static String getSignatureFromJwtString(String jwt) {
-		return jwt.split("\\.")[2];
+		return jwt.substring(jwt.lastIndexOf(".") + 1);
 	}
 
 	public static void assertTrue(boolean result, String message) {

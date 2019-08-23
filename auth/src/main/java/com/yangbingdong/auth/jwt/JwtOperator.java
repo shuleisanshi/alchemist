@@ -15,7 +15,6 @@ import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXPIRATION_SECOND;
 import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXP_KEY_PREFIX;
 import static com.yangbingdong.auth.AuthorizeConstant.TOKEN_PREFIX_LENGTH;
 import static com.youngbingdong.util.jwt.JwtUtils.genJwt;
-import static com.youngbingdong.util.jwt.JwtUtils.genJwtTokenHeader;
 import static com.youngbingdong.util.jwt.JwtUtils.getSignatureFromJwtString;
 import static com.youngbingdong.util.spring.RequestHolder.currentRequest;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -42,8 +41,7 @@ public class JwtOperator {
 
 	public void grantJwt(String sub, HttpServletResponse httpServletResponse) {
 		String jwt = genJwt(sub, SESSION_EXPIRATION_MILLI);
-		String tokenHeader = genJwtTokenHeader(jwt);
-		httpServletResponse.setHeader(AUTHORIZATION_HEADER, tokenHeader);
+		httpServletResponse.setHeader(AUTHORIZATION_HEADER, jwt);
 		if (authProperty.isEnableJwtSession()) {
 			String sessionExpKey = getSessionExpKey(getSignatureFromJwtString(jwt));
 			commonRedisoper.set(sessionExpKey, EMPTY, SESSION_EXPIRATION_SECOND);
