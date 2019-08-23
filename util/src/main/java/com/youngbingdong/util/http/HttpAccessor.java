@@ -80,23 +80,19 @@ public class HttpAccessor {
         if (HTTP_METHOD_GET.equalsIgnoreCase(request.getHttpMethod())) {
             if (request.getParameters() != null && request.getParameters().size() > 0) {
                 Set<String> keys = request.getParameters().keySet();
-                StringBuilder sbuf = new StringBuilder(request.getUrl());
-                if (request.getUrl().contains("=")) {
-                    sbuf.append("&");
-                } else {
-                    sbuf.append("?");
-                }
+                StringBuilder sb = new StringBuilder(request.getUrl());
+                sb.append(request.getUrl().contains("=") ? "&" : "?");
                 for (String key : keys) {
-                    sbuf.append(key).append('=').append(request.getParameters().get(key)).append('&');
+                    sb.append(key).append('=').append(request.getParameters().get(key)).append('&');
                 }
-                request.url(sbuf.substring(0, sbuf.length() - 1));
+                request.url(sb.substring(0, sb.length() - 1));
             }
         } else {
             builder.method(request.getHttpMethod(), createRequestBody(request));
         }
         builder.url(request.getUrl());
         if (log.isDebugEnabled()) {
-            log.debug("OkHttp Request: {}", request.getUrl());
+            log.debug("OkHttp Request Url: {}", request.getUrl());
         }
         if (null != request.getHeaderBuilder()) {
             builder.headers(request.getHeaderBuilder().build());
@@ -114,7 +110,7 @@ public class HttpAccessor {
         } else {
             String json = toJSONString(request.getParameters());
             if (log.isDebugEnabled()) {
-                log.debug("Request Body:\r\n{}", json);
+                log.debug("OkHttp Request Body: {}", json);
             }
             return RequestBody.create(request.getMediaType(), json);
         }
