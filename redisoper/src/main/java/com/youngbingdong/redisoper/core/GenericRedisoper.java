@@ -191,7 +191,7 @@ public class GenericRedisoper<T> {
 
 	public void batchSet2Redis(List<T> entities, boolean enableTransaction) {
 		getRedisTemplate(enableTransaction).execute((RedisCallback<Void>) connection -> {
-			RedisoperUtil.doInPipeline(connection, conn -> of(entities, MAX_REDIS_PAGE).doConsume(e -> batchSet2RedisInner(conn, e)));
+			RedisoperUtil.doInPipeline(connection, conn -> of(entities, MAX_REDIS_PAGE).doPage(e -> batchSet2RedisInner(conn, e)));
 			return null;
 		});
 	}
@@ -295,7 +295,7 @@ public class GenericRedisoper<T> {
 
 	public void batchDeleteInRedis(List<T> entities, boolean enableTransaction) {
 		getRedisTemplate(enableTransaction).execute((RedisCallback<Void>) connection -> {
-			RedisoperUtil.doInPipeline(connection, conn -> of(entities, MAX_REDIS_PAGE).doConsume(e -> batchDeleteInRedisInner(conn, e)));
+			RedisoperUtil.doInPipeline(connection, conn -> of(entities, MAX_REDIS_PAGE).doPage(e -> batchDeleteInRedisInner(conn, e)));
 			return null;
 		});
 	}

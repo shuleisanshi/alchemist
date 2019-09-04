@@ -26,7 +26,7 @@ public class Pager<T> {
         this.totalPage = calculateTotalPage(this.size, this.pageSize);
     }
 
-    public void doConsume(Consumer<List<T>> consumer) {
+    public void doPage(Consumer<List<T>> consumer) {
         for (int i = 0; i < totalPage; i++) {
             if (i == totalPage - 1) {
                 consumer.accept(list.subList(i * pageSize, size));
