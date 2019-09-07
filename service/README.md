@@ -19,6 +19,10 @@ mybatis-plus:
 
 * 字段以及表名使用默认使用驼峰模式, 对应的配置 `mapUnderscoreToCamelCase`
 
+## 扫包配置
+
+可在配置类上加上 `@MapperScan("com.yangbingdong.*.mapper")` 或者在 Mapper 接口上 `@Mapper` 注解.
+
 ## 枚举
 
 配置枚举包扫描:
@@ -244,4 +248,104 @@ private Boolean deleted;
    }
    ```
 
-   
+
+## 自定义拦截器
+
+```java
+@Intercepts({@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class,
+        RowBounds.class, ResultHandler.class})})
+public class PageSettingCacheInterceptor implements Interceptor {
+
+    @Override
+    public Object intercept(Invocation invocation) throws Throwable {
+        Object[] args = invocation.getArgs();
+        MappedStatement ms = (MappedStatement) args[0];
+        if (args.length > 1 & args[1] instanceof Map) {
+            HashMap<String, Object> paramMap = (HashMap<String, Object>) args[1];
+            boolean matches = paramMap.entrySet().stream().anyMatch(entry -> entry.getValue() instanceof Page);
+            if (matches) {
+                Class<?> clazz = ms.getClass();
+                Field useCache = clazz.getDeclaredField("useCache");
+                useCache.setAccessible(true);
+                useCache.set(ms, false);
+            }
+        }
+        return invocation.proceed();
+    }
+
+    @Override
+    public Object plugin(Object target) {
+        if (target instanceof Executor) {
+            return Plugin.wrap(target, this);
+        }
+        return target;
+    }
+
+    @Override
+    public void setProperties(Properties properties) {
+        //do nothing
+    }
+
+}
+```
+
+然后注册到 Spring:
+
+```java
+@Bean
+public PageSettingCacheInterceptor pageSettingCacheInterceptor() {
+    return new PageSettingCacheInterceptor();
+}
+```
+
+## 动态表名
+
+```java
+@Bean
+public PaginationInterceptor paginationInterceptor() {
+    PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
+    DynamicTableNameParser dynamicTableNameParser = new DynamicTableNameParser();
+    dynamicTableNameParser.setTableNameHandlerMap(new HashMap<String, ITableNameHandler>(2) {{
+        put("user", (metaObject, sql, tableName) -> {
+            // metaObject 可以获取传入参数，这里实现你自己的动态规则
+            String year = "_2018";
+            int random = new Random().nextInt(10);
+            if (random % 2 == 1) {
+                year = "_2019";
+            }
+            return tableName + year;
+        });
+    }});
+    paginationInterceptor.setSqlParserList(Collections.singletonList(dynamicTableNameParser));
+    return paginationInterceptor;
+}
+```
+
+## 字段类型处理
+
+可用于json字符串转换
+
+```java
+@Data
+@Accessors(chain = true)
+@TableName(autoResultMap = true)
+public class User {
+
+    /**
+     * 注意！！ 必须开启映射注解
+     *
+     * @TableName(autoResultMap = true)
+     *
+     * 以下两种类型处理器，二选一 也可以同时存在
+     *
+     * 注意！！选择对应的 JSON 处理器也必须存在对应依赖包
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Wallet wallet;
+
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private OtherInfo otherInfo;
+
+}
+```
+

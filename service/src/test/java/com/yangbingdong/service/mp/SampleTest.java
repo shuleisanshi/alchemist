@@ -58,11 +58,11 @@ public class SampleTest {
                 new QueryWrapper<User>().eq("age", AgeEnum.THREE)) > 0);
     }
 
+    // @Transactional
     @Test
     public void select() {
         User user = mapper.selectOne(new QueryWrapper<User>().lambda().eq(User::getId, 2));
         Assert.assertEquals("Jack", user.getName());
-        Assert.assertTrue(AgeEnum.THREE == user.getAge());
     }
 
     @Test
