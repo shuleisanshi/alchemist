@@ -164,7 +164,7 @@ public class GenericRedisoper<T> {
 		getRedisTemplate(enableTransaction).execute((RedisCallback<Void>) connection -> {
 			RedisoperUtil.doInPipeline(connection, conn -> {
 				byte[] rawPrimaryKey = rawPrimaryKey(entity);
-				List<byte[]> allKeys = new ArrayList<>(16);
+				List<byte[]> allKeys = new ArrayList<>(5);
 				conn.set(rawPrimaryKey, rawValue(entity));
 				allKeys.add(rawPrimaryKey);
 				if (entityMetadata.isContainIndex()) {

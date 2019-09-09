@@ -3,24 +3,21 @@ package com.yangbingdong.service.core;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
-import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
+import com.youngbingdong.redisoper.core.GenericRedisoper;
+import com.youngbingdong.redisoper.core.RedisoperAware;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -35,12 +32,15 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unchecked")
 @Slf4j
-public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T> {
+public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>, RedisoperAware<T> {
 
     protected Log logger = LogFactory.getLog(getClass());
 
-    @Autowired
+    @Resource
     protected M baseMapper;
+
+    private Class<T> entityClass;
+    private GenericRedisoper<T> redisoper;
 
     @Override
     public M getBaseMapper() {
@@ -58,7 +58,7 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
     }
 
     protected Class<T> currentModelClass() {
-        return (Class<T>) ReflectionKit.getSuperClassGenericType(getClass(), 1);
+        return entityClass;
     }
 
     /**
@@ -87,9 +87,47 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
         return SqlHelper.table(currentModelClass()).getSqlStatement(sqlMethod.getMethod());
     }
 
+
     @Override
     public boolean save(T entity) {
-        return retBool(baseMapper.insert(entity));
+        try {
+            injectId(entity);
+            boolean retBool = retBool(baseMapper.insert(entity));
+            if (retBool) {
+                redisoper.set2Redis(entity);
+            }
+            return retBool;
+        } catch (DuplicateKeyException e) {
+            Long maxId = baseMapper.selectMaxId() + 1;
+            injectId(entity, maxId);
+            boolean retBool = retBool(baseMapper.insert(entity));
+            if (retBool) {
+                redisoper.set2Redis(entity);
+                redisoper.resetIncrId(maxId);
+            }
+            return retBool;
+        }
+    }
+
+    private void injectId(T entity) {
+        Long entityId = (Long) getEntityId(entity);
+        if (entityId == null) {
+            entityId = getMaxId();
+            injectId(entity, entityId);
+        }
+    }
+
+    private Serializable getEntityId(T t) {
+        return (Serializable) redisoper.getEntityMetadata().getPrimaryValue(t);
+    }
+
+    @Override
+    public Long getMaxId() {
+        return redisoper.incrId(() -> baseMapper.selectMaxId() + 1);
+    }
+
+    private void injectId(T entity, Long id) {
+        redisoper.getEntityMetadata().injectPrimaryValue(entity, id);
     }
 
     /**
@@ -106,6 +144,7 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
         try (SqlSession batchSqlSession = sqlSessionBatch()) {
             int i = 0;
             for (T anEntityList : entityList) {
+                injectId(anEntityList);
                 batchSqlSession.insert(sqlStatement, anEntityList);
                 if (i >= 1 && i % batchSize == 0) {
                     batchSqlSession.flushStatements();
@@ -114,6 +153,7 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
             }
             batchSqlSession.flushStatements();
         }
+        redisoper.batchSet2Redis(new ArrayList<>(entityList));
         return true;
     }
 
@@ -127,13 +167,8 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
     @Override
     public boolean saveOrUpdate(T entity) {
         if (null != entity) {
-            Class<?> cls = entity.getClass();
-            TableInfo tableInfo = TableInfoHelper.getTableInfo(cls);
-            Assert.notNull(tableInfo, "error: can not execute. because can not find cache of TableInfo for entity!");
-            String keyProperty = tableInfo.getKeyProperty();
-            Assert.notEmpty(keyProperty, "error: can not execute. because can not find column for id from entity!");
-            Object idVal = ReflectionKit.getMethodValue(cls, entity, tableInfo.getKeyProperty());
-            return StringUtils.checkValNull(idVal) || Objects.isNull(getById((Serializable) idVal)) ? save(entity) : updateById(entity);
+            Object idVal = getEntityId(entity);
+            return idVal == null ? save(entity) : updateById(entity);
         }
         return false;
     }
@@ -141,7 +176,7 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean saveOrUpdateBatch(Collection<T> entityList, int batchSize) {
-        Assert.notEmpty(entityList, "error: entityList must not be empty");
+        /*Assert.notEmpty(entityList, "error: entityList must not be empty");
         Class<?> cls = currentModelClass();
         TableInfo tableInfo = TableInfoHelper.getTableInfo(cls);
         Assert.notNull(tableInfo, "error: can not execute. because can not find cache of TableInfo for entity!");
@@ -166,74 +201,43 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
             }
             batchSqlSession.flushStatements();
         }
-        return true;
+        return true;*/
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean removeById(Serializable id) {
-        return SqlHelper.retBool(baseMapper.deleteById(id));
-    }
-
-    @Override
-    public boolean removeByMap(Map<String, Object> columnMap) {
-        Assert.notEmpty(columnMap, "error: columnMap must not be empty");
-        return SqlHelper.retBool(baseMapper.deleteByMap(columnMap));
-    }
-
-    @Override
-    public boolean remove(Wrapper<T> wrapper) {
-        return SqlHelper.retBool(baseMapper.delete(wrapper));
-    }
-
-    @Override
-    public boolean removeByIds(Collection<? extends Serializable> idList) {
-        return SqlHelper.retBool(baseMapper.deleteBatchIds(idList));
+        T toBeDelete = getById(id);
+        boolean b = SqlHelper.delBool(baseMapper.deleteById(id));
+        if (b) {
+            redisoper.deleteInRedis(toBeDelete);
+        }
+        return b;
     }
 
     @Override
     public boolean updateById(T entity) {
-        return retBool(baseMapper.updateById(entity));
-    }
-
-    @Override
-    public boolean update(T entity, Wrapper<T> updateWrapper) {
-        return retBool(baseMapper.update(entity, updateWrapper));
+        boolean retBool = retBool(baseMapper.updateById(entity));
+        if (retBool) {
+            Serializable entityId = getEntityId(entity);
+            org.springframework.util.Assert.notNull(entity, "Id could not be null");
+            redisoper.updateInRedis(() -> baseMapper.selectById(entityId), entity);
+        }
+        return retBool;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateBatchById(Collection<T> entityList, int batchSize) {
-        Assert.notEmpty(entityList, "error: entityList must not be empty");
-        String sqlStatement = sqlStatement(SqlMethod.UPDATE_BY_ID);
-        try (SqlSession batchSqlSession = sqlSessionBatch()) {
-            int i = 0;
-            for (T anEntityList : entityList) {
-                MapperMethod.ParamMap<T> param = new MapperMethod.ParamMap<>();
-                param.put(Constants.ENTITY, anEntityList);
-                batchSqlSession.update(sqlStatement, param);
-                if (i >= 1 && i % batchSize == 0) {
-                    batchSqlSession.flushStatements();
-                }
-                i++;
-            }
-            batchSqlSession.flushStatements();
+    public boolean updateBatchById(Collection<T> entityList) {
+        for (T t : entityList) {
+            updateById(t);
         }
         return true;
     }
 
     @Override
     public T getById(Serializable id) {
-        return baseMapper.selectById(id);
-    }
-
-    @Override
-    public Collection<T> listByIds(Collection<? extends Serializable> idList) {
-        return baseMapper.selectBatchIds(idList);
-    }
-
-    @Override
-    public Collection<T> listByMap(Map<String, Object> columnMap) {
-        return baseMapper.selectByMap(columnMap);
+        return redisoper.getByKey(() -> baseMapper.selectById(id), id);
     }
 
     @Override
@@ -282,5 +286,11 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
     @Override
     public <V> V getObj(Wrapper<T> queryWrapper, Function<? super Object, V> mapper) {
         return SqlHelper.getObject(logger, listObjs(queryWrapper, mapper));
+    }
+
+    @Override
+    public void setRedisoper(GenericRedisoper<T> redisoper) {
+        this.redisoper = redisoper;
+        this.entityClass = redisoper.getEntityMetadata().getEntityClass();
     }
 }

@@ -17,6 +17,23 @@ spring:
         max-idle: 16
         #最小空闲
         min-idle: 0
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+#    schema: classpath:db/schema.sql
+#    data: classpath:db/data.sql
+    url: jdbc:mysql://127.0.0.1:3306/service_test?useUnicode=true&characterEncoding=utf8&useSSL=false&useSSL=true&serverTimezone=GMT%2b8
+    username: root
+    password: root
+    initialization-mode: always
+
+# MP 配置
+mybatis-plus:
+#  type-enums-package: com.yangbingdong.service.mp.enums
+  global-config:
+    db-config:
+      id-type: input
+  configuration:
+    cache-enabled: true
 
 
 alchemist:
@@ -27,7 +44,7 @@ alchemist:
       worker: 2
   redisoper:
     serialize-type: protostuff
-    orm-type: none
+    orm-type: mp
     dlock:
       enable: true
       dLockType: redisson

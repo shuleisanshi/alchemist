@@ -583,5 +583,11 @@ ConfigBuilder.convertTableFields
 
 实体类直接使用枚举, 枚举类实现 `EnumValueProvider` 类, 减少不必要的转换. 
 
-MVC的接收VO类也直接使用枚举, 枚举字段上使用 `@JSONField(serializeUsing = FastJsonEnumCodec.class, deserializeUsing = FastJsonEnumCodec.class)` 注解.
+MVC的接收VO类也直接使用枚举, 枚举字段上使用 `@JSONField(serializeUsing = FastJsonEnumCodec.class, deserializeUsing = FastJsonEnumCodec.class)` 注解.
+
+
+
+# TODO
+
+生成代码, Mapper.xml 加上 `@Mapper` 注解, 实体类加上 `@RedisPrimaryKey`
 

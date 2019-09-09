@@ -4,10 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.additional.query.impl.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.service.additional.query.impl.QueryChainWrapper;
-import com.baomidou.mybatisplus.extension.service.additional.update.impl.LambdaUpdateChainWrapper;
-import com.baomidou.mybatisplus.extension.service.additional.update.impl.UpdateChainWrapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
@@ -39,6 +35,8 @@ public interface Service<T> {
     default boolean saveBatch(Collection<T> entityList) {
         return saveBatch(entityList, 1000);
     }
+
+    Long getMaxId();
 
     /**
      * 插入（批量）
@@ -74,67 +72,19 @@ public interface Service<T> {
     boolean removeById(Serializable id);
 
     /**
-     * 根据 columnMap 条件，删除记录
-     *
-     * @param columnMap 表字段 map 对象
-     */
-    boolean removeByMap(Map<String, Object> columnMap);
-
-    /**
-     * 根据 entity 条件，删除记录
-     *
-     * @param queryWrapper 实体包装类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
-     */
-    boolean remove(Wrapper<T> queryWrapper);
-
-    /**
-     * 删除（根据ID 批量删除）
-     *
-     * @param idList 主键ID列表
-     */
-    boolean removeByIds(Collection<? extends Serializable> idList);
-
-    /**
      * 根据 ID 选择修改
      *
      * @param entity 实体对象
      */
     boolean updateById(T entity);
 
-    /**
-     * 根据 whereEntity 条件，更新记录
-     *
-     * @param entity        实体对象
-     * @param updateWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper}
-     */
-    boolean update(T entity, Wrapper<T> updateWrapper);
-
-    /**
-     * 根据 UpdateWrapper 条件，更新记录 需要设置sqlset
-     *
-     * @param updateWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper}
-     */
-    default boolean update(Wrapper<T> updateWrapper) {
-        return update(null, updateWrapper);
-    }
 
     /**
      * 根据ID 批量更新
+     *  @param entityList 实体对象集合
      *
-     * @param entityList 实体对象集合
      */
-    @Transactional(rollbackFor = Exception.class)
-    default boolean updateBatchById(Collection<T> entityList) {
-        return updateBatchById(entityList, 1000);
-    }
-
-    /**
-     * 根据ID 批量更新
-     *
-     * @param entityList 实体对象集合
-     * @param batchSize  更新批次数量
-     */
-    boolean updateBatchById(Collection<T> entityList, int batchSize);
+    boolean updateBatchById(Collection<T> entityList);
 
     /**
      * TableId 注解存在更新记录，否插入一条记录
@@ -149,20 +99,6 @@ public interface Service<T> {
      * @param id 主键ID
      */
     T getById(Serializable id);
-
-    /**
-     * 查询（根据ID 批量查询）
-     *
-     * @param idList 主键ID列表
-     */
-    Collection<T> listByIds(Collection<? extends Serializable> idList);
-
-    /**
-     * 查询（根据 columnMap 条件）
-     *
-     * @param columnMap 表字段 map 对象
-     */
-    Collection<T> listByMap(Map<String, Object> columnMap);
 
     /**
      * 根据 Wrapper，查询一条记录 <br/>
@@ -238,30 +174,11 @@ public interface Service<T> {
     IPage<T> page(IPage<T> page, Wrapper<T> queryWrapper);
 
     /**
-     * 无条件翻页查询
-     *
-     * @param page 翻页对象
-     * @see Wrappers#emptyWrapper()
-     */
-    default IPage<T> page(IPage<T> page) {
-        return page(page, Wrappers.emptyWrapper());
-    }
-
-    /**
      * 查询列表
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
     List<Map<String, Object>> listMaps(Wrapper<T> queryWrapper);
-
-    /**
-     * 查询所有列表
-     *
-     * @see Wrappers#emptyWrapper()
-     */
-    default List<Map<String, Object>> listMaps() {
-        return listMaps(Wrappers.emptyWrapper());
-    }
 
     /**
      * 查询全部记录
@@ -277,15 +194,6 @@ public interface Service<T> {
      */
     default <V> List<V> listObjs(Function<? super Object, V> mapper) {
         return listObjs(Wrappers.emptyWrapper(), mapper);
-    }
-
-    /**
-     * 根据 Wrapper 条件，查询全部记录
-     *
-     * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
-     */
-    default List<Object> listObjs(Wrapper<T> queryWrapper) {
-        return listObjs(queryWrapper, Function.identity());
     }
 
     /**
@@ -320,71 +228,4 @@ public interface Service<T> {
      * @return BaseMapper
      */
     BaseMapper<T> getBaseMapper();
-
-    /**
-     * 以下的方法使用介绍:
-     *
-     * 一. 名称介绍
-     * 1. 方法名带有 query 的为对数据的查询操作, 方法名带有 update 的为对数据的修改操作
-     * 2. 方法名带有 lambda 的为内部方法入参 column 支持函数式的
-     *
-     * 二. 支持介绍
-     * 1. 方法名带有 query 的支持以 {@link ChainQuery} 内部的方法名结尾进行数据查询操作
-     * 2. 方法名带有 update 的支持以 {@link ChainUpdate} 内部的方法名为结尾进行数据修改操作
-     *
-     * 三. 使用示例,只用不带 lambda 的方法各展示一个例子,其他类推
-     * 1. 根据条件获取一条数据: `query().eq("column", value).one()`
-     * 2. 根据条件删除一条数据: `update().eq("column", value).remove()`
-     *
-     */
-
-    /**
-     * 链式查询 普通
-     *
-     * @return QueryWrapper 的包装类
-     */
-    default QueryChainWrapper<T> query() {
-        return new QueryChainWrapper<>(getBaseMapper());
-    }
-
-    /**
-     * 链式查询 lambda 式
-     * <p>注意：不支持 Kotlin </p>
-     *
-     * @return LambdaQueryWrapper 的包装类
-     */
-    default LambdaQueryChainWrapper<T> lambdaQuery() {
-        return new LambdaQueryChainWrapper<>(getBaseMapper());
-    }
-
-    /**
-     * 链式更改 普通
-     *
-     * @return UpdateWrapper 的包装类
-     */
-    default UpdateChainWrapper<T> update() {
-        return new UpdateChainWrapper<>(getBaseMapper());
-    }
-
-    /**
-     * 链式更改 lambda 式
-     * <p>注意：不支持 Kotlin </p>
-     *
-     * @return LambdaUpdateWrapper 的包装类
-     */
-    default LambdaUpdateChainWrapper<T> lambdaUpdate() {
-        return new LambdaUpdateChainWrapper<>(getBaseMapper());
-    }
-
-    /**
-     * <p>
-     * 根据updateWrapper尝试更新，否继续执行saveOrUpdate(T)方法
-     * 此次修改主要是减少了此项业务代码的代码量（存在性验证之后的saveOrUpdate操作）
-     * </p>
-     *
-     * @param entity 实体对象
-     */
-    default boolean saveOrUpdate(T entity, Wrapper<T> updateWrapper) {
-        return update(entity, updateWrapper) || saveOrUpdate(entity);
-    }
 }
