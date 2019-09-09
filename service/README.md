@@ -349,3 +349,233 @@ public class User {
 }
 ```
 
+# 代码生成器
+
+由 `AutoGenerator` 类驱动, 主要配置分为一下几个部分:
+
+## TemplateEngine
+
+模板引擎配置.
+
+默认使用 `Velocity`, 如果要使用 `Freemarker`, 需要单独引入 `pom` 依赖:
+
+```xml
+<dependency>
+    <groupId>org.freemarker</groupId>
+    <artifactId>freemarker</artifactId>
+    <version>2.3.29</version>
+</dependency>
+```
+
+```java
+autoGenerator.setTemplateEngine(new FreemarkerTemplateEngine());
+```
+
+## PackageConfig
+
+包名配置.
+
+```java
+private PackageConfig getPackageConfig() {
+    PackageConfig packageConfig = new PackageConfig();
+    packageConfig.setParent(BASE_PACKAGE) // 顶层包名, 例如 com.yangbingdong
+                 .setController("mvc.controller")
+                 .setEntity("domain.entity")
+                 .setMapper("domain.mapper")
+                 .setService("domain.service")
+                 .setServiceImpl("domain.service.impl")
+                 .setModuleName("user");  // 模块名, 如果配置了, 会自动拼在顶层报名后面, com.yangbingdong.user
+    return packageConfig;
+}
+
+autoGenerator.setPackageInfo(getPackageConfig());
+```
+
+## DataSource
+
+数据源配置.
+
+```java
+private DataSourceConfig getDataSourceConfig() {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    dataSourceConfig.setDbType(DbType.MYSQL)
+                    .setUrl(DB_URL)
+                    .setUsername(DB_USERNAME)
+                    .setPassword(DB_PASSWORD)
+                    .setDriverName("com.mysql.jdbc.Driver")
+                    .setTypeConvert(new CustomMySqlTypeConvert());  // 自定义类型映射
+    return dataSourceConfig;
+}
+
+autoGenerator.setDataSource(getDataSourceConfig());
+```
+
+```java
+static class CustomMySqlTypeConvert implements ITypeConvert {
+
+    @Override
+    public DbColumnType processTypeConvert(GlobalConfig globalConfig, String fieldType) {
+        String t = fieldType.toLowerCase();
+        if (t.contains("char")) {
+            return DbColumnType.STRING;
+        } else if (t.contains("bigint")) {
+            return DbColumnType.LONG;
+        } else if (t.contains("tinyint(1)")) {
+            return DbColumnType.BOOLEAN;
+        } else if (t.contains("tinyint(4)")) {
+            return DbColumnType.BYTE;
+        } else if (t.contains("int")) {
+            return DbColumnType.INTEGER;
+        } else if (t.contains("text")) {
+            return DbColumnType.STRING;
+        } else if (t.contains("bit")) {
+            return DbColumnType.BOOLEAN;
+        } else if (t.contains("decimal")) {
+            return DbColumnType.BIG_DECIMAL;
+        } else if (t.contains("clob")) {
+            return DbColumnType.CLOB;
+        } else if (t.contains("blob")) {
+            return DbColumnType.BLOB;
+        } else if (t.contains("binary")) {
+            return DbColumnType.BYTE_ARRAY;
+        } else if (t.contains("float")) {
+            return DbColumnType.FLOAT;
+        } else if (t.contains("double")) {
+            return DbColumnType.DOUBLE;
+        } else if (t.contains("json") || t.contains("enum")) {
+            return DbColumnType.STRING;
+        } else if (t.contains("date") || t.contains("time") || t.contains("year")) {
+            switch (globalConfig.getDateType()) {
+                case ONLY_DATE:
+                    return DbColumnType.DATE;
+                case SQL_PACK:
+                    switch (t) {
+                        case "date":
+                        case "year":
+                            return DbColumnType.DATE_SQL;
+                        case "time":
+                            return DbColumnType.TIME;
+                        default:
+                            return DbColumnType.TIMESTAMP;
+                    }
+                case TIME_PACK:
+                    switch (t) {
+                        case "date":
+                            return DbColumnType.LOCAL_DATE;
+                        case "time":
+                            return DbColumnType.LOCAL_TIME;
+                        case "year":
+                            return DbColumnType.YEAR;
+                        default:
+                            return DbColumnType.LOCAL_DATE_TIME;
+                    }
+            }
+        }
+        return DbColumnType.STRING;
+    }
+}
+```
+
+## Strategy
+
+策略配置, 制定或排除需要生成的表代码, 指定一些生成的配置. 更多信息直接查看 `StrategyConfig` 类.
+
+```java
+private StrategyConfig getStrategyConfig() {
+    StrategyConfig strategyConfig = new StrategyConfig();
+    strategyConfig.setSkipView(true)  // 跳过视图
+                  .setTablePrefix("test_")  // 表前缀, 比如 test_user, 映射成user
+                  .setEntityLombokModel(true) // 生成lombok注解
+                  .setNaming(NamingStrategy.underline_to_camel) // 下划线转驼峰模式
+                  .setEntityColumnConstant(true)  // 生成字段常亮
+                  .setEntityBooleanColumnRemoveIsPrefix(false)  // Boolean类型字段是否移除is前缀, 默认为false
+                  .setRestControllerStyle(true)  // 生成 @RestController 控制器
+                  .setInclude("test_user", "test_role")  // 需要生成的表
+                  .setLogicDeleteFieldName("deleted");  // 逻辑删除字段, 如果表中含有该字段则会贴上 @TableLogic 注解
+    
+    // 生成自动填充注解
+    List<TableFill> tableFills = new ArrayList<>();
+    tableFills.add(new TableFill("create_time", FieldFill.INSERT));
+    tableFills.add(new TableFill("update_time", FieldFill.INSERT_UPDATE));
+    strategyConfig.setTableFillList(tableFills);
+    
+    if (IS_USE_REDIS_CACHE) {
+        // service以及mapper的公共父类
+        strategyConfig.setSuperServiceClass(BASE_PACKAGE + ".common.service.IBaseService")
+                      .setSuperServiceImplClass(BASE_PACKAGE + ".common.service.impl.BaseServiceImpl")
+                      .setSuperMapperClass(BASE_PACKAGE + ".common.expand.MyBaseMapper");
+    }
+    return strategyConfig;
+}
+
+autoGenerator.setStrategy(getStrategyConfig());
+```
+
+## GlobalConfig
+
+```java
+private GlobalConfig getGlobalConfig() {
+    GlobalConfig config = new GlobalConfig();
+    config.setActiveRecord(false)  // 开启 ActiveRecord 模式, 默认为 false
+          .setBaseResultMap(true)  // xml 文件中生成 BaseResultMap
+          .setBaseColumnList(true)  // xml 文件中生成 baseColumnList
+          .setAuthor(AUTHOR)
+          .setOutputDir("/home/ybd/data/git-repo/github/own/alchemist/service/src/main" + "/java") // 生成文件的输出目录
+          .setFileOverride(true)  // 是否覆盖已有文件
+          .setIdType(INPUT)  // 指定生成的主键的ID类型
+          .setOpen(false);  // 是否打开输出目录
+    config.setServiceName("%sService");  // 各层文件名称方式，例如： %sAction 生成 UserAction
+    return config;
+}
+
+autoGenerator.setGlobalConfig(getGlobalConfig());
+```
+
+## InjectionConfig
+
+注入配置，通过该配置，可注入自定义参数等操作以实现个性化操作.
+
+```java
+private InjectionConfig getFileOutConfig() {
+    // 自定义xml输出目录配置
+    InjectionConfig cfg = new InjectionConfig() {
+        @Override
+        public void initMap() {
+            Map<String, Object> map = new HashMap<>();
+            map.put("abc", this.getConfig().getGlobalConfig().getAuthor() + "-mp");
+            this.setMap(map);
+        }
+    };
+    List<FileOutConfig> focList = new ArrayList<>();
+    focList.add(new FileOutConfig("/templates/mapper.xml.ftl") {
+        @Override
+        public String outputFile(TableInfo tableInfo) {
+            return OUTPUT_DIR + "/resources/mapper/" + tableInfo.getEntityName() + "Mapper" + StringPool.DOT_XML;
+        }
+    });
+    cfg.setFileOutConfigList(focList);
+    return cfg;
+}
+
+autoGenerator.setCfg(getFileOutConfig());
+```
+
+上面自定义的属性 `abc`, 在模板中通过 `cfg.abc` 获取.
+
+## Template
+
+模板位置配置, 如果不需要生成某些模板比如 `Controller`, 或者有自己的模板的时候, 可以自定义配置.
+
+```java
+// 不生成 Controller 以及 Mapper.xml
+autoGenerator.setTemplate(new TemplateConfig().setXml(null).setController(null));
+```
+
+
+
+# MARK
+
+```
+ConfigBuilder.convertTableFields
+```
+

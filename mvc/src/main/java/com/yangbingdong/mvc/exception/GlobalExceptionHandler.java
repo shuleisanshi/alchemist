@@ -18,6 +18,7 @@ import javax.validation.ConstraintViolationException;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 /**
  * @author ybd
@@ -68,7 +69,7 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(value = TokenException.class)
-	@ResponseStatus(FORBIDDEN)
+	@ResponseStatus(UNAUTHORIZED)
 	public Response<Void> tokenExceptionHandler(TokenException ex) {
 		log.error("Token校验异常捕获: " + ex.getMessage());
 		return Response.error(ex.getMessage(), FORBIDDEN.value());
