@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,6 +25,7 @@ import static com.yangbingdong.service.util.Wrappers.query;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
 public class SampleTest {
 
     @Resource
@@ -48,14 +50,28 @@ public class SampleTest {
 
     @Test
     public void delete() {
+        User user = new User();
+        user.setId(666L)
+            .setName("D神")
+            .setAge(AgeEnum.ONE)
+            .setEmail("yangbingdong1994@gmail.com");
+
+        Assert.assertTrue(mapper.insert(user) > 0);
         Assert.assertTrue(mapper.delete(new QueryWrapper<User>()
-                .lambda().eq(User::getAge, AgeEnum.TWO)) > 0);
+                .lambda().eq(User::getAge, AgeEnum.ONE)) > 0);
     }
 
     @Test
     public void update() {
+        User user = new User();
+        user.setId(666L)
+            .setName("D神")
+            .setAge(AgeEnum.ONE)
+            .setEmail("yangbingdong1994@gmail.com");
+
+        Assert.assertTrue(mapper.insert(user) > 0);
         Assert.assertTrue(mapper.update(new User().setAge(AgeEnum.TWO),
-                new QueryWrapper<User>().eq("age", AgeEnum.THREE)) > 0);
+                new QueryWrapper<User>().eq("age", AgeEnum.ONE)) > 0);
     }
 
     // @Transactional

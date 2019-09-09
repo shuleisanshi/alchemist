@@ -40,9 +40,9 @@ public class PaginationTest {
     @Test
     public void lambdaPagination() {
         Page<User> page = new Page<>(1, 3);
-        page.setOptimizeCountSql(false).setSearchCount(false);
+        page.setOptimizeCountSql(true).setSearchCount(true);
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.lambda().ge(User::getAge, 1).orderByAsc(User::getAge);
+        wrapper.lambda().ge(User::getAge, 0).orderByAsc(User::getAge);
         IPage<User> result = mapper.selectPage(page, wrapper);
         System.out.println(result.getTotal());
         Assert.assertTrue(result.getTotal() > 3);
@@ -53,7 +53,7 @@ public class PaginationTest {
     public void tests1() {
         System.out.println("----- baseMapper 自带分页 ------");
         Page<User> page = new Page<>(2, 5);
-        IPage<User> userIPage = mapper.selectPage(page, new QueryWrapper<User>().eq("age", 20).eq("name", "Jack"));
+        IPage<User> userIPage = mapper.selectPage(page, new QueryWrapper<User>().eq("age", 1).eq("name", "Jack"));
         assertThat(page).isSameAs(userIPage);
         System.out.println("总条数 ------> " + userIPage.getTotal());
         System.out.println("当前页数 ------> " + userIPage.getCurrent());
@@ -68,7 +68,7 @@ public class PaginationTest {
         System.out.println("json 正反序列化 end");
 
         System.out.println("----- 自定义 XML 分页 ------");
-        MyPage<User> myPage = new MyPage<User>(3, 5).setSelectInt(20).setSelectStr("Jack");
+        MyPage<User> myPage = new MyPage<User>(3, 5).setSelectInt(1).setSelectStr("Jack");
         ParamSome paramSome = new ParamSome(20, "Jack");
         MyPage<User> userMyPage = mapper.mySelectPage(myPage, paramSome);
         assertThat(myPage).isSameAs(userMyPage);
@@ -89,7 +89,7 @@ public class PaginationTest {
         records.forEach(System.out::println);
 
         /* 下面的 left join 会对 count 进行优化,因为 where 条件里没有 join 的表的条件 */
-        myPage = new MyPage<UserChildren>(1, 5).setSelectInt(18);
+        myPage = new MyPage<UserChildren>(1, 5).setSelectInt(1);
         userChildrenMyPage = mapper.userChildrenPage(myPage);
         records = userChildrenMyPage.getRecords();
         records.forEach(System.out::println);

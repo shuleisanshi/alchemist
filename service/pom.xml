@@ -77,6 +77,11 @@
             <groupId>com.yangbingdong</groupId>
             <artifactId>util</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.yangbingdong</groupId>
+            <artifactId>redisoper</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -478,7 +478,7 @@ static class CustomMySqlTypeConvert implements ITypeConvert {
 
 ## Strategy
 
-策略配置, 制定或排除需要生成的表代码, 指定一些生成的配置. 更多信息直接查看 `StrategyConfig` 类.
+策略配置, 制定或排除需要生成的表代码, 指定一些生成的配置. 更多信息直接查看 `StrategyConfig` 类.
 
 ```java
 private StrategyConfig getStrategyConfig() {
@@ -578,4 +578,10 @@ autoGenerator.setTemplate(new TemplateConfig().setXml(null).setController(null))
 ```
 ConfigBuilder.convertTableFields
 ```
+
+# 使用规范
+
+实体类直接使用枚举, 枚举类实现 `EnumValueProvider` 类, 减少不必要的转换. 
+
+MVC的接收VO类也直接使用枚举, 枚举字段上使用 `@JSONField(serializeUsing = FastJsonEnumCodec.class, deserializeUsing = FastJsonEnumCodec.class)` 注解.
 

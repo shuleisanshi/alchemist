@@ -20,6 +20,7 @@
         <module>redisoper</module>
         <module>mvc</module>
         <module>auth</module>
+        <module>service</module>
     </modules>
 
     <properties>
@@ -29,7 +30,7 @@
         <java.version>1.8</java.version>
         <commons-lang3.version>3.7</commons-lang3.version>
         <commons-collections4.version>4.1</commons-collections4.version>
-        <fastjson.version>1.2.56</fastjson.version>
+        <fastjson.version>1.2.60</fastjson.version>
     </properties>
 
     <dependencies>
@@ -98,6 +99,11 @@
             <dependency>
                 <groupId>com.yangbingdong</groupId>
                 <artifactId>auth</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yangbingdong</groupId>
+                <artifactId>service</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

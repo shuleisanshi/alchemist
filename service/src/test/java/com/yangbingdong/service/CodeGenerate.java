@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class CodeGenerate {
     private final static boolean IS_USE_REDIS_CACHE = false;
 
     @Test
+    @Ignore
     public void generateCode() {
         generateByTables();
     }
