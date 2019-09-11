@@ -13,7 +13,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class MvcProperty {
 	public static final String PREFIX = "alchemist.mvc";
 
-	private boolean oplog;
+	private boolean opLog;
+
+	private boolean printRequestInfoIfError;
+
+	private boolean printRequestInfoIfBusinessError;
 
 	private Disruptor disruptor = new Disruptor();
 

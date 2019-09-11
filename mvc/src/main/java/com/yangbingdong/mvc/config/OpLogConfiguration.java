@@ -18,11 +18,9 @@ import org.springframework.context.annotation.Import;
  * @contact yangbingdong1994@gmail.com
  */
 @Configuration
-@ConditionalOnProperty(prefix = "alchemist.mvc", name = "oplog", havingValue = "true")
+@ConditionalOnProperty(prefix = "alchemist.mvc", name = "op-log", havingValue = "true")
 @Import(DisruptorAutoConfiguration.class)
 public class OpLogConfiguration {
-
-    public static final String OP_LOG_EVENT_CONTEXT_HANDLER = "opLogEventContextHandler";
 
 	@Bean
 	@ConditionalOnMissingBean

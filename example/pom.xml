@@ -45,6 +45,7 @@
             <version>2.3.29</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>

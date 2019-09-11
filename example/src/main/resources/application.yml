@@ -39,7 +39,9 @@ mybatis-plus:
 
 alchemist:
   mvc:
-    oplog: true
+    op-log: true
+    print-request-info-if-error: false
+    print-request-info-if-business-error: false
     disruptor:
       power: 11
       worker: 2

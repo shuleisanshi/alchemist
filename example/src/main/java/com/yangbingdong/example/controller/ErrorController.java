@@ -16,6 +16,6 @@ public class ErrorController {
 	@IgnoreAuth
 	@GetMapping("/mock")
 	public void mockException() {
-		AssertUtils.throwBusiException("This is mock exception");
+		AssertUtils.throwBusinessException("This is mock exception");
 	}
 }

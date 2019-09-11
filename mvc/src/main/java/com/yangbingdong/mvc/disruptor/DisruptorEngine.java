@@ -53,8 +53,15 @@ public class DisruptorEngine implements InitializingBean, ApplicationListener<Co
 	private DisruptorInnerShardingHandler[] buildHandlers() {
 		Map<Class, DisruptorEventSourceHandler> handlerMap = new HashMap<>(sourceHandlers.size());
 		for (DisruptorEventSourceHandler sourceHandler : sourceHandlers) {
-			Class clazz = TypeUtil.getClassFromGenericTypeInterface(sourceHandler, DisruptorEventSourceHandler.class);
-			handlerMap.put(clazz, sourceHandler);
+			Class clazz = TypeUtil.getClassFromGenericTypeInterface(sourceHandler.getClass(), DisruptorEventSourceHandler.class);
+            if (clazz == null) {
+                throw new IllegalArgumentException("Class could not be null");
+            }
+            DisruptorEventSourceHandler oldHandler = handlerMap.get(clazz);
+            if (oldHandler != null) {
+                throw new IllegalArgumentException("Not allow multi handler");
+            }
+            handlerMap.put(clazz, sourceHandler);
 		}
 		return IntStream.range(0, worker)
 						.mapToObj(i -> new DisruptorInnerShardingHandler(handlerMap))
