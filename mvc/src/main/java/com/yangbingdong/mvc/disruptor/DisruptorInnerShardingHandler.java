@@ -2,10 +2,9 @@ package com.yangbingdong.mvc.disruptor;
 
 
 import com.lmax.disruptor.WorkHandler;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-
-import static org.springframework.util.Assert.notNull;
 
 
 /**
@@ -13,6 +12,7 @@ import static org.springframework.util.Assert.notNull;
  * @date 19-5-7
  * @contact yangbingdong1994@gmail.com
  */
+@Slf4j
 class DisruptorInnerShardingHandler<S> implements WorkHandler<DisruptorEvent<S>> {
 
 	private Map<Class, DisruptorEventSourceHandler<S>> handlerMap;
@@ -26,8 +26,11 @@ class DisruptorInnerShardingHandler<S> implements WorkHandler<DisruptorEvent<S>>
 		try {
 			Class sourceClass = event.getSourceClass();
 			DisruptorEventSourceHandler<S> sourceHandler = handlerMap.get(sourceClass);
-			notNull(sourceHandler, "Source handler not found: " + sourceClass);
-			sourceHandler.handlerSource(event.getSource());
+            if (sourceHandler == null) {
+                log.error("Source handler not found: " + sourceClass);
+            } else {
+                sourceHandler.handlerSource(event.getSource());
+            }
 		} finally {
 			event.clean();
 		}

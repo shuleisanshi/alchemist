@@ -10,21 +10,16 @@ import java.lang.reflect.Type;
  */
 public class TypeUtil {
 
-	public static Class<?> getClassFromGenericTypeInterface(Object source, Class<?> interfaceClass) {
-		Class<?> genericClass = null;
-		Class<?> beanClass = source.getClass();
+	public static Class<?> getClassFromGenericTypeInterface(Class<?> beanClass, Class<?> interfaceClass) {
 		Type[] genericInterfaces = beanClass.getGenericInterfaces();
 		for (Type genericInterface : genericInterfaces) {
-			if (genericInterface instanceof ParameterizedType && ((ParameterizedType)genericInterface).getRawType() == interfaceClass) {
-				genericClass = (Class<?>) ((ParameterizedType) genericInterface).getActualTypeArguments()[0];
-			}
+            if (genericInterface instanceof Class && interfaceClass.isAssignableFrom((Class<?>) genericInterface)) {
+                return getClassFromGenericTypeInterface((Class<?>) genericInterface, interfaceClass);
+            }
+            if (genericInterface instanceof ParameterizedType && interfaceClass.isAssignableFrom((Class<?>) ((ParameterizedType) genericInterface).getRawType())) {
+                return (Class<?>) ((ParameterizedType) genericInterface).getActualTypeArguments()[0];
+            }
 		}
-		if (genericClass == null) {
-			Type genericSuperclass = beanClass.getGenericSuperclass();
-			if (genericSuperclass instanceof ParameterizedType && ((ParameterizedType)genericSuperclass).getRawType() == interfaceClass) {
-				genericClass = (Class<?>) ((ParameterizedType) genericSuperclass).getActualTypeArguments()[0];
-			}
-		}
-		return genericClass;
+		return null;
 	}
 }

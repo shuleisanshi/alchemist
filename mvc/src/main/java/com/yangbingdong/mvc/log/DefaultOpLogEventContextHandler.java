@@ -1,6 +1,6 @@
 package com.yangbingdong.mvc.log;
 
-import com.yangbingdong.mvc.disruptor.DisruptorEventSourceHandler;
+import com.yangbingdong.mvc.log.core.OpLogEventSourceHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
  * @contact yangbingdong1994@gmail.com
  */
 @Slf4j
-public class DefaultOpLogEventContextHandler implements DisruptorEventSourceHandler<OpLogContext> {
+public class DefaultOpLogEventContextHandler implements OpLogEventSourceHandler<OpLogContext> {
 
 	@Override
 	public void handlerSource(OpLogContext source) {

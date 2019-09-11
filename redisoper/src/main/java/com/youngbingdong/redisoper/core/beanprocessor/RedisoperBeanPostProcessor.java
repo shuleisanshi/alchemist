@@ -13,7 +13,7 @@ public class RedisoperBeanPostProcessor extends AbstractBeanPostProcessor {
 
 	@Override
 	Class resolveEntityClass(Object bean) {
-		return getClassFromGenericTypeInterface(bean, RedisoperAware.class);
+		return getClassFromGenericTypeInterface(bean.getClass(), RedisoperAware.class);
 	}
 
 }

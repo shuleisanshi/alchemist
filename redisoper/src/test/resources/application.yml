@@ -7,7 +7,7 @@ spring:
     lettuce:
       pool:
         #最大连接数
-        max-active: 5
+        max-active: 13
         #最大阻塞等待时间(负数表示没限制)
         max-wait: 5s
         #最大空闲

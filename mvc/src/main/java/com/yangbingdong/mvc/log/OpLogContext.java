@@ -1,9 +1,8 @@
 package com.yangbingdong.mvc.log;
 
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
 import com.alibaba.fastjson.JSONObject;
-import eu.bitwalker.useragentutils.Browser;
-import eu.bitwalker.useragentutils.OperatingSystem;
-import eu.bitwalker.useragentutils.UserAgent;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -35,31 +34,29 @@ public class OpLogContext {
 	private LocalDateTime opTime;
 	private JoinPoint joinPoint;
 	private String desc;
-	private HttpServletRequest httpServletRequest;
 	private String ip;
 	private String url;
 	private String userAgent;
+    private String returnValue;
 	private Throwable exception;
 
 	private String operatingSystem;
 	private String browserVersion;
 	private String receiveData;
 
-	protected OpLogContext parseOperatingSystemAndBrowser() {
-		UserAgent userAgent = UserAgent.parseUserAgentString(this.userAgent);
-		OperatingSystem operatingSystem = userAgent.getOperatingSystem();
-		Browser browser = userAgent.getBrowser();
-		if ("Unknown".equalsIgnoreCase(operatingSystem.getName())
-				&& "Unknown".equalsIgnoreCase(browser.getName())) {
+	public OpLogContext parseOperatingSystemAndBrowser() {
+        UserAgent userAgent = UserAgentUtil.parse(this.userAgent);
+		if ("Unknown".equalsIgnoreCase(userAgent.getOs().getName())
+				&& "Unknown".equalsIgnoreCase(userAgent.getBrowser().getName())) {
 			this.operatingSystem = this.userAgent;
 			return this;
 		}
-		this.operatingSystem = operatingSystem.getName();
-		this.browserVersion = browser.getName() + userAgent.getBrowserVersion().getVersion();
+		this.operatingSystem = userAgent.getOs().getName();
+		this.browserVersion = userAgent.getBrowser().getName() + userAgent.getVersion();
 		return this;
 	}
 
-	protected OpLogContext parseReceiveData() {
+	public OpLogContext parseReceiveData() {
 		MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 		String[] paramNames = methodSignature.getParameterNames();
 		int length = paramNames.length;

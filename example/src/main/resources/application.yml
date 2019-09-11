@@ -18,8 +18,9 @@ spring:
         #最小空闲
         min-idle: 0
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+#    driver-class-name: com.mysql.jdbc.Driver
 #    schema: classpath:db/schema.sql
+
 #    data: classpath:db/data.sql
     url: jdbc:mysql://127.0.0.1:3306/service_test?useUnicode=true&characterEncoding=utf8&useSSL=false&useSSL=true&serverTimezone=GMT%2b8
     username: root
@@ -46,7 +47,7 @@ alchemist:
     serialize-type: protostuff
     orm-type: mp
     dlock:
-      enable: true
+      enable: false
       dLockType: redisson
   auth:
     enable-jwt-session: true

@@ -80,12 +80,6 @@
         </dependency>
 
         <dependency>
-            <groupId>eu.bitwalker</groupId>
-            <artifactId>UserAgentUtils</artifactId>
-            <version>1.21</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.yangbingdong</groupId>
             <artifactId>util</artifactId>
         </dependency>

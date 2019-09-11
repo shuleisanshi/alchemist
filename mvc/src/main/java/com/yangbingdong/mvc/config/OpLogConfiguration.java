@@ -1,11 +1,11 @@
 package com.yangbingdong.mvc.config;
 
-import com.yangbingdong.mvc.disruptor.DisruptorEventSourceHandler;
-import com.yangbingdong.mvc.log.core.OpLogAspect;
-import com.yangbingdong.mvc.log.core.OpLogContextBuilder;
 import com.yangbingdong.mvc.log.DefaultOpLogContextBuilder;
 import com.yangbingdong.mvc.log.DefaultOpLogEventContextHandler;
 import com.yangbingdong.mvc.log.OpLogContext;
+import com.yangbingdong.mvc.log.core.OpLogAspect;
+import com.yangbingdong.mvc.log.core.OpLogContextBuilder;
+import com.yangbingdong.mvc.log.core.OpLogEventSourceHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -18,13 +18,11 @@ import org.springframework.context.annotation.Import;
  * @contact yangbingdong1994@gmail.com
  */
 @Configuration
-@ConditionalOnProperty(prefix = OpLogConfiguration.PREFIX, name = "oplog", havingValue = "true")
+@ConditionalOnProperty(prefix = "alchemist.mvc", name = "oplog", havingValue = "true")
 @Import(DisruptorAutoConfiguration.class)
 public class OpLogConfiguration {
 
-	public static final String PREFIX = "alchemist.mvc";
-
-	public static final String OP_LOG_EVENT_CONTEXT_HANDLER = "opLogEventContextHandler";
+    public static final String OP_LOG_EVENT_CONTEXT_HANDLER = "opLogEventContextHandler";
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -32,9 +30,9 @@ public class OpLogConfiguration {
 		return new DefaultOpLogContextBuilder();
 	}
 
-	@Bean(name = OP_LOG_EVENT_CONTEXT_HANDLER)
-	@ConditionalOnMissingBean(name = OP_LOG_EVENT_CONTEXT_HANDLER)
-	public DisruptorEventSourceHandler<? extends OpLogContext> opLogEventContextHandler() {
+    @Bean
+    @ConditionalOnMissingBean
+	public OpLogEventSourceHandler opLogEventSourceHandler() {
 		return new DefaultOpLogEventContextHandler();
 	}
 

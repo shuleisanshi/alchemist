@@ -10,6 +10,6 @@ import org.aspectj.lang.JoinPoint;
  */
 public interface OpLogContextBuilder<T extends OpLogContext> {
 
-	T buildContext(JoinPoint joinPoint, OpLog opLog, Throwable exception);
+	T buildContext(JoinPoint joinPoint, OpLog opLog, Object returnValue, Throwable exception);
 
 }

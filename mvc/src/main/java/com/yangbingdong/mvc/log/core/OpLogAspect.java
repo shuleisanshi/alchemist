@@ -23,15 +23,15 @@ public class OpLogAspect {
 	@Autowired
 	private OpLogContextBuilder opLogContextBuilder;
 
-	@AfterReturning(value = "@annotation(opLog)")
-	public void doAfterReturning(JoinPoint joinPoint, OpLog opLog) {
-		Object opLogContext = opLogContextBuilder.buildContext(joinPoint, opLog, null);
+	@AfterReturning(value = "@annotation(opLog)", returning = "returnValue")
+	public void doAfterReturning(JoinPoint joinPoint, OpLog opLog, Object returnValue) {
+		Object opLogContext = opLogContextBuilder.buildContext(joinPoint, opLog, returnValue, null);
 		disruptorEngine.publish(opLogContext);
 	}
 
 	@AfterThrowing(value = "@annotation(opLog)", throwing = "exception")
 	public void doAfterThrowing(JoinPoint joinPoint, OpLog opLog, Throwable exception) {
-		Object opLogContext = opLogContextBuilder.buildContext(joinPoint, opLog, exception);
+		Object opLogContext = opLogContextBuilder.buildContext(joinPoint, opLog, null, exception);
 		disruptorEngine.publish(opLogContext);
 	}
 }
