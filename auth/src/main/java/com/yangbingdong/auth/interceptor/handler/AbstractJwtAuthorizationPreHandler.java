@@ -1,24 +1,28 @@
 package com.yangbingdong.auth.interceptor.handler;
 
+import com.alibaba.fastjson.util.TypeUtils;
 import com.yangbingdong.auth.config.AuthProperty;
 import com.yangbingdong.auth.interceptor.AuthContext;
 import com.yangbingdong.auth.jwt.JwtOperator;
 import com.youngbingdong.redisoper.extend.commom.CommonRedisoper;
+import com.youngbingdong.util.jwt.Jwt;
+import com.youngbingdong.util.jwt.JwtPayload;
+import com.youngbingdong.util.jwt.TokenException;
 import com.youngbingdong.util.time.SystemTimer;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
-import static com.yangbingdong.auth.AuthorizeConstant.AUTHORIZATION_HEADER;
-import static com.yangbingdong.auth.AuthorizeConstant.REFRESH_INTERVAL;
+import static cn.hutool.core.util.StrUtil.isEmpty;
+import static com.yangbingdong.auth.AuthorizeConstant.REFRESH_INTERVAL_MILLI;
 import static com.yangbingdong.auth.AuthorizeConstant.REFRESH_TOKEN_LOCK_PREFIX;
-import static com.youngbingdong.util.jwt.JwtUtils.assertTrue;
-import static com.youngbingdong.util.jwt.JwtUtils.parseJwt;
-import static com.youngbingdong.util.jwt.JwtUtils.validTokenPrefix;
+import static com.youngbingdong.util.jwt.AuthUtil.AUTHORIZATION_HEADER;
+import static com.youngbingdong.util.jwt.AuthUtil.parseAuthJwt;
+import static com.youngbingdong.util.jwt.AuthUtil.validTokenPrefix;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
@@ -26,7 +30,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  * @date 19-5-22
  * @contact yangbingdong1994@gmail.com
  */
-public abstract class AbstractJwtAuthorizationPreHandler implements AuthorizationPreHandler {
+public abstract class AbstractJwtAuthorizationPreHandler<T extends JwtPayload<T>> implements AuthorizationPreHandler {
 
 	@Resource
 	private CommonRedisoper commonRedisoper;
@@ -37,37 +41,52 @@ public abstract class AbstractJwtAuthorizationPreHandler implements Authorizatio
 	@Resource
 	private AuthProperty authProperty;
 
-	protected abstract void preHandler(AuthContext authContext);
+    private Class<T> clazz;
+
+    @SuppressWarnings("unchecked")
+    public AbstractJwtAuthorizationPreHandler() {
+        Type genericParamType = TypeUtils.getGenericParamType(this.getClass());
+        this.clazz = (Class<T>) ((ParameterizedType) genericParamType).getActualTypeArguments()[0];
+    }
+
+    protected abstract void preHandle(AuthContext<T> authContext);
 
 	@Override
 	public void preHandleAuth(HttpServletRequest request, HttpServletResponse response, Method method) {
-		Jws<Claims> claimsJws = checkAndGetJwtFromAuthHeader(request);
-		checkSessionExpire(claimsJws);
-		preHandler(AuthContext.of(request, response, method, claimsJws));
-		refreshJwtIfProximityTimeout(response, claimsJws);
+        Jwt<T> jwt = checkAndGetJwtFromAuthHeader(request);
+		checkSessionExpire(jwt);
+		preHandle(AuthContext.of(request, response, method, jwt));
+		refreshJwtIfProximityTimeout(response, jwt);
 	}
 
-	private Jws<Claims> checkAndGetJwtFromAuthHeader(HttpServletRequest request) {
+	private Jwt<T> checkAndGetJwtFromAuthHeader(HttpServletRequest request) {
 		String authorizationToken = request.getHeader(AUTHORIZATION_HEADER);
-		assertTrue(validTokenPrefix(authorizationToken), "Invalid Token Prefix");
-		return parseJwt(authorizationToken);
+		if(isEmpty(authorizationToken)) {
+            throw new TokenException("Token could not be null");
+        }
+        if (validTokenPrefix(authorizationToken)) {
+            throw new TokenException("Invalid Token Prefix");
+        }
+		return parseAuthJwt(authorizationToken, authProperty.getSignKey(), clazz);
 	}
 
-	private void checkSessionExpire(Jws<Claims> claimsJws) {
+	private void checkSessionExpire(Jwt<? extends JwtPayload> jwt) {
 		if (authProperty.isEnableJwtSession()) {
-			String sessionExpKey = jwtOperator.getSessionExpKey(claimsJws.getSignature());
+			String sessionExpKey = jwtOperator.getSessionExpKey(jwt.getSign());
 			Long ttl = jwtOperator.getSessionTtlCache().get(sessionExpKey, key -> commonRedisoper.ttl(key));
-			assertTrue(ttl != null && ttl > 0, "会话已过期");
+            if (ttl == null || ttl <= 0) {
+                throw new TokenException("Invalid Token");
+            }
 		}
 	}
 
-	private void refreshJwtIfProximityTimeout(HttpServletResponse response, Jws<Claims> claimsJws) {
-		Claims claims = claimsJws.getBody();
-		long interval = claims.getExpiration().getTime() - SystemTimer.now();
-		if (interval < REFRESH_INTERVAL) {
-			Boolean nx = commonRedisoper.setNx(REFRESH_TOKEN_LOCK_PREFIX + claimsJws.getSignature(), EMPTY, 5L);
+	private void refreshJwtIfProximityTimeout(HttpServletResponse response, Jwt<? extends JwtPayload> jwt) {
+        long expire = jwt.getJwtHeader().getExpire();
+        long interval = expire - SystemTimer.now();
+		if (interval < REFRESH_INTERVAL_MILLI) {
+			Boolean nx = commonRedisoper.setNx(REFRESH_TOKEN_LOCK_PREFIX + jwt.getSign(), EMPTY, 600L);
 			if (nx) {
-				jwtOperator.grantJwt(claims.getSubject(), response);
+				jwtOperator.grantAuthJwt(jwt.getPayload(), response);
 			}
 		}
 	}

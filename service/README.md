@@ -571,7 +571,15 @@ autoGenerator.setCfg(getFileOutConfig());
 autoGenerator.setTemplate(new TemplateConfig().setXml(null).setController(null));
 ```
 
+# 特性以及使用说明
 
+- [x] 集成 MyBatis Plus, 简化开发
+- [x] 增强 MyBatis Plus 的通用 Service, 集成了 Redisoper 模块
+- [x] Redis 事务增强, 在事务环境中可读取到更新后的值, 请看 `RedisTransactionResourceHolder` 与  `CustomDataSourceTransactionManager`.
+- [x] 增加了 `selectMaxId` 的全局方法, 请看 `CustomLogicSqlInjector`
+- [x] `createTime`, `updateTime`, `deleted` 自动填充, 请看 `CustomMetaObjectHandler`
+- [x] 实体可直接使用枚举, 枚举实现 `EnumValueProvider` 接口.
+- [x] 接收 JSON 的 DTO 可直接使用枚举, 枚举字段需要贴上 `@JSONField(serializeUsing = FastJsonEnumCodec.class, deserializeUsing = FastJsonEnumCodec.class)`
 
 # MARK
 
@@ -589,5 +597,5 @@ MVC的接收VO类也直接使用枚举, 枚举字段上使用 `@JSONField(serial
 
 # TODO
 
-生成代码, Mapper.xml 加上 `@Mapper` 注解, 实体类加上 `@RedisPrimaryKey`
+生成代码, Mapper.xml 加上 `@Mapper` 注解, 实体类加上 `@RedisPrimaryKey`, service加上索引查询
 

@@ -7,7 +7,7 @@ import org.springframework.util.StringUtils;
 import java.util.Collection;
 import java.util.Map;
 
-public class AssertUtils {
+public class AssertUtil {
     public static void throwBusinessException(String message) throws BusinessException {
         throw new BusinessException(message);
     }

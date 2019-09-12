@@ -23,21 +23,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- ######################### JWT ############################ -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>0.10.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.10.5</version>
-            <scope>runtime</scope>
-        </dependency>
-        <!-- ######################### JWT End ############################ -->
-
         <!-- 读取 CVS -->
         <!-- http://opencsv.sourceforge.net/ -->
         <!-- https://www.baeldung.com/opencsv -->

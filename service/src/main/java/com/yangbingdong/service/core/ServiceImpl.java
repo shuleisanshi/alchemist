@@ -208,7 +208,7 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
     @Override
     public boolean removeById(Serializable id) {
         T toBeDelete = getById(id);
-        boolean b = SqlHelper.delBool(baseMapper.deleteById(id));
+        boolean b = SqlHelper.retBool(baseMapper.deleteById(id));
         if (b) {
             redisoper.deleteInRedis(toBeDelete);
         }

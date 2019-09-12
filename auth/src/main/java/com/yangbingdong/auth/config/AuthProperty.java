@@ -16,6 +16,8 @@ public class AuthProperty {
 
 	private boolean enableJwtSession = true;
 
+    private String signKey = "DEFAULT_SIGN_KEY";
+
 	private long localSessionExpireSecond = 5 * 60L;
 
 	private long localSessionCacheMaximumSize = 50_000;

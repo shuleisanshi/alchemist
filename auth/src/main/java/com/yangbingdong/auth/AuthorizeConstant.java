@@ -7,17 +7,11 @@ package com.yangbingdong.auth;
  */
 public interface AuthorizeConstant {
 
-	String BEARER = "Bearer ";
+    String SESSION_EXP_KEY_PREFIX = "SESSION:";
 
-	int TOKEN_PREFIX_LENGTH = BEARER.length();
+	long REFRESH_INTERVAL_MILLI = 60 * 60 * 1000;
 
-	String AUTHORIZATION_HEADER = "Authorization";
-
-	String SESSION_EXP_KEY_PREFIX = "SESSION:";
-
-	long REFRESH_INTERVAL = 30 * 60 * 1000;
-
-	long SESSION_EXPIRATION_SECOND = 2 * 60 * 60;
+	long SESSION_EXPIRATION_SECOND = 24 * 60 * 60;
 
 	long SESSION_EXPIRATION_MILLI = SESSION_EXPIRATION_SECOND * 1000;
 

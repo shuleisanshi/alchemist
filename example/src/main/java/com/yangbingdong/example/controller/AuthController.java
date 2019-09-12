@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import static com.youngbingdong.util.spring.RequestHolder.currentResponse;
-
 /**
  * @author ybd
  * @date 19-5-23
@@ -29,7 +27,8 @@ public class AuthController {
 	@IgnoreAuth
 	@PostMapping("/login/{name}")
 	public void login(@PathVariable String name) {
-		jwtOperator.grantJwt(name, currentResponse());
+        MyJwtPayload myJwtPayload = new MyJwtPayload();
+		jwtOperator.grantAuthJwt(myJwtPayload.setName(name));
 	}
 
 	@GetMapping("/info")
@@ -39,11 +38,11 @@ public class AuthController {
 
 	@PostMapping("/logout")
 	public void logout() {
-		jwtOperator.eraseSession(null);
+		jwtOperator.eraseSession();
 	}
 
 	@PostMapping("/logout-fully")
 	public void fullyLogout() {
-		jwtOperator.eraseSession(jwtOperator::cleanLocalSession);
+		jwtOperator.eraseSession();
 	}
 }

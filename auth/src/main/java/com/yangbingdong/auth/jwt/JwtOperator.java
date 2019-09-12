@@ -1,23 +1,24 @@
 package com.yangbingdong.auth.jwt;
 
+import cn.hutool.core.util.StrUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.yangbingdong.auth.config.AuthProperty;
 import com.youngbingdong.redisoper.extend.commom.CommonRedisoper;
+import com.youngbingdong.util.jwt.AuthUtil;
+import com.youngbingdong.util.jwt.JwtPayload;
 import lombok.Getter;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.yangbingdong.auth.AuthorizeConstant.AUTHORIZATION_HEADER;
+import static cn.hutool.core.util.StrUtil.EMPTY;
 import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXPIRATION_MILLI;
 import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXPIRATION_SECOND;
 import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXP_KEY_PREFIX;
-import static com.yangbingdong.auth.AuthorizeConstant.TOKEN_PREFIX_LENGTH;
-import static com.youngbingdong.util.jwt.JwtUtils.genJwt;
-import static com.youngbingdong.util.jwt.JwtUtils.getSignatureFromJwtString;
-import static com.youngbingdong.util.spring.RequestHolder.currentRequest;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static com.youngbingdong.util.jwt.AuthUtil.AUTHORIZATION_HEADER;
+import static com.youngbingdong.util.jwt.AuthUtil.getSignFromAuthJwt;
+import static com.youngbingdong.util.jwt.AuthUtil.getSignatureFromCurrentReq;
+import static com.youngbingdong.util.spring.RequestHolder.currentResponse;
 
 /**
  * @author ybd
@@ -26,56 +27,56 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  */
 public class JwtOperator {
 
-	@Getter
-	private Cache<String, Long> sessionTtlCache;
+    @Getter
+    private Cache<String, Long> sessionTtlCache;
 
-	@Resource
-	private CommonRedisoper commonRedisoper;
+    @Resource
+    private CommonRedisoper commonRedisoper;
 
-	@Resource
-	private AuthProperty authProperty;
+    @Resource
+    private AuthProperty authProperty;
 
-	public JwtOperator(Cache<String, Long> sessionTtlCache) {
-		this.sessionTtlCache = sessionTtlCache;
-	}
+    public JwtOperator(Cache<String, Long> sessionTtlCache) {
+        this.sessionTtlCache = sessionTtlCache;
+    }
 
-	public void grantJwt(String sub, HttpServletResponse httpServletResponse) {
-		String jwt = genJwt(sub, SESSION_EXPIRATION_MILLI);
-		httpServletResponse.setHeader(AUTHORIZATION_HEADER, jwt);
-		if (authProperty.isEnableJwtSession()) {
-			String sessionExpKey = getSessionExpKey(getSignatureFromJwtString(jwt));
-			commonRedisoper.set(sessionExpKey, EMPTY, SESSION_EXPIRATION_SECOND);
-			sessionTtlCache.put(sessionExpKey, SESSION_EXPIRATION_SECOND);
-		}
-	}
+    public String grantAuthJwt(JwtPayload jwtPayload) {
+        return grantAuthJwt(jwtPayload, currentResponse());
+    }
 
-	public String getSessionExpKey(String signature) {
-		return SESSION_EXP_KEY_PREFIX + signature;
-	}
+    public String grantAuthJwt(JwtPayload jwtPayload, HttpServletResponse httpServletResponse) {
+        String authJwt = AuthUtil.grantAuthJwt(jwtPayload, authProperty.getSignKey(), SESSION_EXPIRATION_MILLI);
+        httpServletResponse.setHeader(AUTHORIZATION_HEADER, authJwt);
+        if (authProperty.isEnableJwtSession()) {
+            String sessionExpKey = getSessionExpKey(getSignFromAuthJwt(authJwt));
+            commonRedisoper.set(sessionExpKey, EMPTY, SESSION_EXPIRATION_SECOND);
+            sessionTtlCache.put(sessionExpKey, SESSION_EXPIRATION_SECOND);
+        }
+        return authJwt;
+    }
 
-	public String getSessionExpKey() {
-		return SESSION_EXP_KEY_PREFIX + getSignatureFromCurrentReq();
-	}
+    public String getSessionExpKey(String signature) {
+        return SESSION_EXP_KEY_PREFIX + signature;
+    }
 
-	public void eraseSession(JwtOperatorHandler jwtOperatorHandler) {
-		if (!authProperty.isEnableJwtSession()) {
-			return;
-		}
-		String sessionExpKey = getSessionExpKey();
-		commonRedisoper.del(sessionExpKey);
-		cleanLocalSession(sessionExpKey);
-		if (jwtOperatorHandler != null) {
-			jwtOperatorHandler.afterEraseSession(sessionExpKey);
-		}
-	}
+    public String getSessionExpKey() {
+        return SESSION_EXP_KEY_PREFIX + getSignatureFromCurrentReq();
+    }
 
-	public String getSignatureFromCurrentReq() {
-		HttpServletRequest request = currentRequest();
-		String token = request.getHeader(AUTHORIZATION_HEADER);
-		return getSignatureFromJwtString(token.substring(TOKEN_PREFIX_LENGTH));
-	}
+    public void eraseSession() {
+        if (!authProperty.isEnableJwtSession()) {
+            return;
+        }
+        String sessionExpKey = getSessionExpKey();
+        if (StrUtil.isEmpty(sessionExpKey)) {
+            return;
+        }
+        commonRedisoper.del(sessionExpKey);
+        cleanLocalSession(sessionExpKey);
+    }
 
-	public void cleanLocalSession(String sessionExpKey) {
-		sessionTtlCache.invalidate(sessionExpKey);
-	}
+    public void cleanLocalSession(String sessionExpKey) {
+        sessionTtlCache.invalidate(sessionExpKey);
+    }
+
 }

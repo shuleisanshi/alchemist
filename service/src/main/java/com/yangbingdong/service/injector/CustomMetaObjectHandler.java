@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 import static com.youngbingdong.util.time.SystemTimer.nowDateTime;
 
 /**
- * 填充器
- *
- * @author nieqiurong 2018-08-10 22:59:23.
+ * @author ybd
+ * @date 2019/9/3
+ * @contact yangbingdong1994@gmail.com
  */
 public class CustomMetaObjectHandler implements MetaObjectHandler {
 

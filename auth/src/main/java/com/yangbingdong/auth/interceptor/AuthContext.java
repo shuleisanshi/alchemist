@@ -1,7 +1,7 @@
 package com.yangbingdong.auth.interceptor;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
+import com.youngbingdong.util.jwt.Jwt;
+import com.youngbingdong.util.jwt.JwtPayload;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -16,20 +16,18 @@ import java.lang.reflect.Method;
  */
 @Data
 @Accessors(chain = true)
-public class AuthContext {
-	private HttpServletRequest request;
-	private HttpServletResponse response;
-	private Method method;
-	private Jws<Claims> claimsJws;
+public class AuthContext<T extends JwtPayload<T>> {
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+    private Method method;
+    private Jwt<T> jwt;
 
-	public static AuthContext of(HttpServletRequest request, HttpServletResponse response, Method method, Jws<Claims> claimsJws) {
-		return new AuthContext().setRequest(request)
-								.setResponse(response)
-								.setMethod(method)
-								.setClaimsJws(claimsJws);
-	}
-
-	public String getSubject() {
-		return this.claimsJws.getBody().getSubject();
-	}
+    public static <T extends JwtPayload<T>> AuthContext<T> of(HttpServletRequest request, HttpServletResponse response, Method method, Jwt<T> jwt) {
+        AuthContext<T> authContext = new AuthContext<>();
+        authContext.setRequest(request)
+                   .setResponse(response)
+                   .setMethod(method)
+                   .setJwt(jwt);
+        return authContext;
+    }
 }

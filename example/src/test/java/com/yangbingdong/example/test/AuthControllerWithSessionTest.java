@@ -2,13 +2,16 @@ package com.yangbingdong.example.test;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.yangbingdong.auth.config.AuthProperty;
 import com.yangbingdong.auth.jwt.JwtOperator;
 import com.yangbingdong.example.ExampleApplicationTests;
 import com.yangbingdong.example.controller.AuthController;
+import com.yangbingdong.example.controller.MyJwtPayload;
 import com.yangbingdong.mvc.Response;
 import com.youngbingdong.redisoper.extend.commom.CommonRedisoper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
+import com.youngbingdong.util.jwt.AuthUtil;
+import com.youngbingdong.util.jwt.Jwt;
+import com.youngbingdong.util.jwt.JwtPayload;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,11 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static com.yangbingdong.auth.AuthorizeConstant.AUTHORIZATION_HEADER;
 import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXPIRATION_SECOND;
-import static com.yangbingdong.auth.AuthorizeConstant.TOKEN_PREFIX_LENGTH;
-import static com.youngbingdong.util.jwt.JwtUtils.getSignatureFromJwtString;
-import static com.youngbingdong.util.jwt.JwtUtils.parseJwt;
+import static com.youngbingdong.util.jwt.AuthUtil.AUTHORIZATION_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,6 +46,9 @@ public class AuthControllerWithSessionTest extends ExampleApplicationTests {
 	@Autowired
 	private CommonRedisoper commonRedisoper;
 
+    @Autowired
+    private AuthProperty authProperty;
+
 	@Test
 	public void loginSuccessAndExpectHavingTokenInHeader() throws Exception {
 		String name = "yangbingdong";
@@ -54,11 +57,11 @@ public class AuthControllerWithSessionTest extends ExampleApplicationTests {
 			   .andDo(print())
 			   .andExpect(header().exists(AUTHORIZATION_HEADER))
 			   .andExpect(result -> {
-				   String header = result.getResponse().getHeader(AUTHORIZATION_HEADER);
-				   assertThat(header).isNotNull();
-				   Jws<Claims> claimsJws = parseJwt(header);
-				   assertThat(claimsJws.getBody().getSubject()).isNotNull()
-															   .isEqualTo(name);
+				   String authJwt = result.getResponse().getHeader(AUTHORIZATION_HEADER);
+				   assertThat(authJwt).isNotNull();
+                   Jwt<? extends JwtPayload> jwt = AuthUtil.parseAuthJwt(authJwt, authProperty.getSignKey(), MyJwtPayload.class);
+                   assertThat(((MyJwtPayload)jwt.getPayload()).getName()).isNotNull()
+                                                              .isEqualTo(name);
 			   });
 	}
 
@@ -87,7 +90,7 @@ public class AuthControllerWithSessionTest extends ExampleApplicationTests {
 	}
 
 	@Test
-	public void accessAuthUrlWithIllegalAuthTokenHeaderAndExpect403ResultCode() throws Exception {
+	public void accessAuthUrlWithIllegalAuthTokenHeaderAndExpect401ResultCode() throws Exception {
 		String header = loginAndGetAuthHeader();
 		header = header.substring(0, header.length() - 2);
 		MvcResult mvcResult = mockMvc.perform(get("/auth/info").header(AUTHORIZATION_HEADER, header))
@@ -97,11 +100,11 @@ public class AuthControllerWithSessionTest extends ExampleApplicationTests {
 		Response response = JSONObject.parseObject(content, Response.class);
 		assertThat(response).isNotNull();
 		assertThat(response.getBody()).isNull();
-		assertThat(response.getCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+		assertThat(response.getCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 	}
 
 	@Test
-	public void accessAuthUtlWithoutAuthTokenAndExpect403Forbidden() throws Exception {
+	public void accessAuthUtlWithoutAuthTokenAndExpect401UnAuthorized() throws Exception {
 		MvcResult mvcResult = mockMvc.perform(get("/auth/info"))
 									 .andExpect(status().is4xxClientError())
 									 .andReturn();
@@ -109,7 +112,7 @@ public class AuthControllerWithSessionTest extends ExampleApplicationTests {
 		Response response = JSONObject.parseObject(content, Response.class);
 		assertThat(response).isNotNull();
 		assertThat(response.getBody()).isNull();
-		assertThat(response.getCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+		assertThat(response.getCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 	}
 
 	@Test
@@ -126,7 +129,7 @@ public class AuthControllerWithSessionTest extends ExampleApplicationTests {
 	}
 
 	@Test
-	public void logoutFullyAndExpectAccessDenied() throws Exception {
+	public void logoutFullyAndExpectUnAuthorized() throws Exception {
 		String header = loginAndGetAuthHeader();
 		String sessionExpKey = assertSessionInCache(header);
 
@@ -144,19 +147,19 @@ public class AuthControllerWithSessionTest extends ExampleApplicationTests {
 		Response response = JSONObject.parseObject(content, Response.class);
 		assertThat(response).isNotNull();
 		assertThat(response.getBody()).isNull();
-		assertThat(response.getCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+		assertThat(response.getCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 	}
 
 	@Test
 	public void loginAndCleanLocalSessionAndExpectAccessRight() throws Exception {
-		String header = loginAndGetAuthHeader();
-		String signature = getSignatureFromJwtString(header.substring(TOKEN_PREFIX_LENGTH));
+		String authJwt = loginAndGetAuthHeader();
+		String signature = AuthUtil.getSignFromAuthJwt(authJwt);
 		jwtOperator.cleanLocalSession(jwtOperator.getSessionExpKey(signature));
-		getAuthInfoAndExpectRight(header);
+		getAuthInfoAndExpectRight(authJwt);
 	}
 
-	private String assertSessionInCache(String header) {
-		String signature = getSignatureFromJwtString(header.substring(TOKEN_PREFIX_LENGTH));
+	private String assertSessionInCache(String authJwt) {
+		String signature = AuthUtil.getSignFromAuthJwt(authJwt);
 		String sessionExpKey = jwtOperator.getSessionExpKey(signature);
 		Boolean existSessionInRedis = commonRedisoper.exists(sessionExpKey);
 		assertThat(existSessionInRedis).isTrue();

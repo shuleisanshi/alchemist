@@ -55,3 +55,4 @@ alchemist:
     enable-jwt-session: true
     local-session-cache-maximum-size: 50000
     local-session-expire-second: 300
+    sign-key: HelloWorld

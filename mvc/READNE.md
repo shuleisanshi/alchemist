@@ -75,9 +75,3 @@ alchemist:
 * 配置了 `MDCCleanFilter`, 用于清除 `MDC`.
 * 扩展了 Log4j2 (请看 `SpringEnvironmentLookup`), 可以在 `log4j2.xml` 中获取到配置文件中的信息.
 * 自定义 `SpringApplicationRunListener` (请看 `MvcProfileIncludeInitializer`), 在环境变量中添加了 `mvc` 模块的配置文件.
-
-
-
-# TODO
-
-RBAC 通用模块.

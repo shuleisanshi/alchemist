@@ -2,7 +2,7 @@ package com.yangbingdong.example.controller;
 
 import com.yangbingdong.auth.annotated.IgnoreAuth;
 import com.yangbingdong.mvc.annotated.Rest;
-import com.youngbingdong.util.exception.AssertUtils;
+import com.youngbingdong.util.exception.AssertUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -16,6 +16,6 @@ public class ErrorController {
 	@IgnoreAuth
 	@GetMapping("/mock")
 	public void mockException() {
-		AssertUtils.throwBusinessException("This is mock exception");
+		AssertUtil.throwBusinessException("This is mock exception");
 	}
 }

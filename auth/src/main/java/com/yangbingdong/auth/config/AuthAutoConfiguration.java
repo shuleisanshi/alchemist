@@ -3,8 +3,6 @@ package com.yangbingdong.auth.config;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.yangbingdong.auth.jwt.JwtOperator;
-import com.youngbingdong.redisoper.config.RedisoperAutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +16,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @contact yangbingdong1994@gmail.com
  */
 @Configuration
-@AutoConfigureAfter(RedisoperAutoConfiguration.class)
 @Import(AuthorizationInterceptorConfiguration.class)
 @EnableConfigurationProperties(AuthProperty.class)
 public class AuthAutoConfiguration {
@@ -28,7 +25,8 @@ public class AuthAutoConfiguration {
 		Cache<String, Long> cache = null;
 		if (authProperty.isEnableJwtSession()) {
 			cache = Caffeine.newBuilder()
-							.expireAfterWrite(authProperty.getLocalSessionExpireSecond(), SECONDS)
+                            .expireAfterAccess(authProperty.getLocalSessionExpireSecond(), SECONDS)
+                            .expireAfterWrite(authProperty.getLocalSessionExpireSecond(), SECONDS)
 							.maximumSize(authProperty.getLocalSessionCacheMaximumSize())
 							.build();
 		}
