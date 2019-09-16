@@ -1,6 +1,7 @@
 package com.yangbingdong.mvc.exception;
 
 import cn.hutool.core.text.StrFormatter;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import com.yangbingdong.mvc.Response;
 import com.yangbingdong.mvc.config.MvcProperty;
@@ -111,7 +112,7 @@ public class GlobalExceptionHandler {
                 name + ", Request Info:\nmethod: {}\nuri   : {}\nparam : {}\nbody  : {}\nheader: {}",
                 httpServletRequest.getMethod(),
                 httpServletRequest.getRequestURI(),
-                decodeParamMap(httpServletRequest.getQueryString(), "UTF-8"),
+                decodeParamMap(httpServletRequest.getQueryString(), CharsetUtil.UTF_8),
                 defaultIfNull(parseObject(RequestHolder.getRequestBody()), StrUtil.EMPTY_JSON),
                 RequestHolder.getAllHeader());
     }

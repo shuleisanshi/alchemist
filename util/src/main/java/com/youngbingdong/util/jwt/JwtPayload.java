@@ -19,4 +19,11 @@ public class JwtPayload<T extends JwtPayload<T>> {
         this.id = id;
         return thisAsT;
     }
+
+    @Override
+    public String toString() {
+        return "JwtPayload{" +
+                "id=" + id +
+                '}';
+    }
 }
