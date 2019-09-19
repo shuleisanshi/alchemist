@@ -17,11 +17,13 @@
 ```yml
 alchemist:
   auth:
-    enable-jwt-session: true  // 是否启用Session, 因为 Jwt 本身无状态
-    session-expire-second: 86400 // jwt session 过期时间
-    local-session-cache-maximum-size: 50000  //  Session本地缓存最大存储量
-    local-session-expire-second: 300  // Session本地缓存过期时间
+    enable-jwt-session: true  // 是否启用Session, 因为 Jwt 本身无状态, 默认开启
+    session-expire-second: 86400 // jwt session 过期时间, 默认一个小时
+    local-session-cache-maximum-size: 50000  //  Session本地缓存最大存储量, 默认50000
+    refresh-interval-milli: 3600000  // token 距离过期时间多少毫秒刷新, 默认一个小时
+    local-session-expire-second: 300  // Session本地缓存过期时间, 默认5分钟
     sign-key: HelloWorld  // Token 签名的Key
+    register-method-url-mapping: true  // 构建 Map<Method method, String url>, 通过MethodUrlMapping操作
 ```
 
 继承 `JwtPayload`, 定义自己的业务字段:
