@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class JwtPerfTest {
 
-    private static final JwtPayload defaultPayload = new JwtPayload().setId(666L);
+    private static final JwtPayload defaultPayload = new JwtPayload(){}.setId("666");
 
     @Benchmark
     public String genJwt() {

@@ -5,17 +5,17 @@ package com.youngbingdong.util.jwt;
  * @date 2019/9/12
  * @contact yangbingdong1994@gmail.com
  */
-public class JwtPayload<T extends JwtPayload<T>> {
-    private Long id;
+public abstract class JwtPayload<T extends JwtPayload<T>> {
+    private String id;
 
     @SuppressWarnings("unchecked")
-    private final T thisAsT = (T) this;
+    private transient T thisAsT = (T) this;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public T setId(Long id) {
+    public T setId(String id) {
         this.id = id;
         return thisAsT;
     }

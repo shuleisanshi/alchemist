@@ -1,12 +1,11 @@
 package com.yangbingdong.mvc.exception;
 
 import cn.hutool.core.text.StrFormatter;
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.core.util.StrUtil;
 import com.yangbingdong.mvc.Response;
 import com.yangbingdong.mvc.config.MvcProperty;
 import com.youngbingdong.util.exception.BusinessException;
 import com.youngbingdong.util.jwt.TokenException;
+import com.youngbingdong.util.jwt.TokenExpireException;
 import com.youngbingdong.util.spring.RequestHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import static cn.hutool.core.util.CharsetUtil.UTF_8;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static cn.hutool.core.util.StrUtil.EMPTY_JSON;
 import static cn.hutool.http.HttpUtil.decodeParamMap;
 import static com.alibaba.fastjson.JSON.parseObject;
+import static com.yangbingdong.mvc.Response.error;
+import static com.youngbingdong.util.constant.CommonRespCode.TOKEN_EXPIRE;
+import static com.youngbingdong.util.constant.CommonRespCode.UN_AUTH;
+import static com.youngbingdong.util.spring.RequestHolder.currentRequestHeader;
+import static com.youngbingdong.util.spring.RequestHolder.getRequestBody;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -66,7 +72,7 @@ public class GlobalExceptionHandler {
 		} else {
 			validateFailReason = "Unknown error message";
 		}
-		return Response.error(validateFailReason);
+		return error(validateFailReason);
 	}
 
 	@ExceptionHandler(value = BusinessException.class)
@@ -75,24 +81,31 @@ public class GlobalExceptionHandler {
         if (mvcProperty.isPrintRequestInfoIfError()) {
             String info = getRequestInfoFormatString("业务异常捕获");
             log.error(info, ex);
-            return Response.error(ex);
+            return error(ex);
         }
 		log.error("业务异常捕获: " + ex.getMessage());
-		return Response.error(ex);
+		return error(ex);
 	}
 
 	@ExceptionHandler(value = NoHandlerFoundException.class)
 	@ResponseStatus(NOT_FOUND)
 	public Response<Void> notFoundExceptionHandler(NoHandlerFoundException ex) {
-		return Response.error(ex, NOT_FOUND.value());
+		return error(ex, NOT_FOUND.value());
 	}
 
 	@ExceptionHandler(value = TokenException.class)
 	@ResponseStatus(UNAUTHORIZED)
 	public Response<Void> tokenExceptionHandler(TokenException ex) {
 		log.error("Token校验异常捕获: " + ex.getMessage());
-		return Response.error(ex.getMessage(), UNAUTHORIZED.value());
+		return error(ex.getMessage(), UN_AUTH);
 	}
+
+    @ExceptionHandler(value = TokenExpireException.class)
+    @ResponseStatus(UNAUTHORIZED)
+    public Response<Void> tokenExpireExceptionHandler(TokenExpireException ex) {
+        log.error("Token过期异常捕获: " + ex.getMessage());
+        return error(ex.getMessage(), TOKEN_EXPIRE);
+    }
 
 	@ExceptionHandler(value = Exception.class)
 	@ResponseStatus(INTERNAL_SERVER_ERROR)
@@ -100,10 +113,10 @@ public class GlobalExceptionHandler {
         if (mvcProperty.isPrintRequestInfoIfError()) {
             String info = getRequestInfoFormatString("全局异常捕获");
             log.error(info, ex);
-            return Response.error(ex);
+            return error(ex);
         }
         log.error("全局异常捕获, ", ex);
-        return Response.error(ex);
+        return error(ex);
 	}
 
     private String getRequestInfoFormatString(final String name) {
@@ -112,12 +125,8 @@ public class GlobalExceptionHandler {
                 name + ", Request Info:\nmethod: {}\nuri   : {}\nparam : {}\nbody  : {}\nheader: {}",
                 httpServletRequest.getMethod(),
                 httpServletRequest.getRequestURI(),
-                decodeParamMap(httpServletRequest.getQueryString(), CharsetUtil.UTF_8),
-                defaultIfNull(parseObject(RequestHolder.getRequestBody()), StrUtil.EMPTY_JSON),
-                RequestHolder.getAllHeader());
-    }
-
-    public static void main(String[] args) {
-
+                decodeParamMap(httpServletRequest.getQueryString(), UTF_8),
+                defaultIfNull(parseObject(getRequestBody()), EMPTY_JSON),
+                currentRequestHeader());
     }
 }

@@ -53,6 +53,9 @@ alchemist:
       dLockType: redisson
   auth:
     enable-jwt-session: true
+    session-expire-second: 86400
     local-session-cache-maximum-size: 50000
     local-session-expire-second: 300
+    refresh-interval-milli: 3600000
     sign-key: HelloWorld
+    register-method-url-mapping: true

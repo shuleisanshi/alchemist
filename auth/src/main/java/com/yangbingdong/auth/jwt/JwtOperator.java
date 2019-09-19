@@ -12,8 +12,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import static cn.hutool.core.util.StrUtil.EMPTY;
-import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXPIRATION_MILLI;
-import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXPIRATION_SECOND;
 import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXP_KEY_PREFIX;
 import static com.youngbingdong.util.jwt.AuthUtil.AUTHORIZATION_HEADER;
 import static com.youngbingdong.util.jwt.AuthUtil.getSignFromAuthJwt;
@@ -45,12 +43,12 @@ public class JwtOperator {
     }
 
     public String grantAuthJwt(JwtPayload jwtPayload, HttpServletResponse httpServletResponse) {
-        String authJwt = AuthUtil.grantAuthJwt(jwtPayload, authProperty.getSignKey(), SESSION_EXPIRATION_MILLI);
+        String authJwt = AuthUtil.grantAuthJwt(jwtPayload, authProperty.getSignKey(), authProperty.getSessionExpireSecond() * 1000);
         httpServletResponse.setHeader(AUTHORIZATION_HEADER, authJwt);
         if (authProperty.isEnableJwtSession()) {
             String sessionExpKey = getSessionExpKey(getSignFromAuthJwt(authJwt));
-            commonRedisoper.set(sessionExpKey, EMPTY, SESSION_EXPIRATION_SECOND);
-            sessionTtlCache.put(sessionExpKey, SESSION_EXPIRATION_SECOND);
+            commonRedisoper.set(sessionExpKey, EMPTY, authProperty.getSessionExpireSecond());
+            sessionTtlCache.put(sessionExpKey, authProperty.getSessionExpireSecond());
         }
         return authJwt;
     }

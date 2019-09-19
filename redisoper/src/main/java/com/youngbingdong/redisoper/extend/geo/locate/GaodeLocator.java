@@ -36,7 +36,7 @@ public class GaodeLocator implements Locator {
         String realParam = String.format(PARAM, address, key);
         String signMd5 = SecureUtil.md5(realParam + sign);
         ApiRequest<JSONObject> request = newRequest(URL + realParam + "&sig=" + signMd5, JSONObject.class);
-        JSONObject json = HttpAccessor.send(request);
+        JSONObject json = HttpAccessor.access(request);
         String status = (String) json.getOrDefault("status", "-1");
         if (!"1".equals(status)) {
             log.error("获取失败 -> " + address);

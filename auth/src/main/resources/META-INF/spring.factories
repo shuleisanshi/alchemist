@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.yangbingdong.auth.config.AuthAutoConfiguration
+  com.yangbingdong.auth.config.AuthAutoConfiguration,\
+  com.yangbingdong.auth.rbac.MethodUrlMappingConfiguration

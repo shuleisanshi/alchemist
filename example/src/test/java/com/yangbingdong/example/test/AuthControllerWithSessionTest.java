@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static com.yangbingdong.auth.AuthorizeConstant.SESSION_EXPIRATION_SECOND;
+import static com.yangbingdong.auth.AuthorizeConstant.DEFAULT_SESSION_EXPIRATION_SECOND;
 import static com.youngbingdong.util.jwt.AuthUtil.AUTHORIZATION_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -164,7 +164,7 @@ public class AuthControllerWithSessionTest extends ExampleApplicationTests {
 		Boolean existSessionInRedis = commonRedisoper.exists(sessionExpKey);
 		assertThat(existSessionInRedis).isTrue();
 		Long ttlInLocalCache = jwtOperator.getSessionTtlCache().getIfPresent(sessionExpKey);
-		assertThat(ttlInLocalCache).isEqualTo(SESSION_EXPIRATION_SECOND);
+		assertThat(ttlInLocalCache).isEqualTo(DEFAULT_SESSION_EXPIRATION_SECOND);
 		return sessionExpKey;
 	}
 

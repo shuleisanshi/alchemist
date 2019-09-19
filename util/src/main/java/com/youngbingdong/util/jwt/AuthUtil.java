@@ -20,7 +20,7 @@ public class AuthUtil {
     public static final int BEARER_LENGTH = BEARER.length();
 
     public static boolean validTokenPrefix(String token) {
-        return !token.startsWith(BEARER);
+        return token.startsWith(BEARER);
     }
 
     public static String grantAuthJwt(JwtPayload jwtPayload, String key, long ttlMillis) {

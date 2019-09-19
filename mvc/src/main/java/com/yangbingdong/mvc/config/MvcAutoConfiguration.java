@@ -65,11 +65,13 @@ public class MvcAutoConfiguration {
             super(ConfigurationPhase.REGISTER_BEAN);
         }
 
+        @SuppressWarnings("unused")
         @ConditionalOnProperty(name = "alchemist.mvc.print-request-info-if-error", havingValue = "true")
         static class GlobalCondition {
 
         }
 
+        @SuppressWarnings("unused")
         @ConditionalOnProperty(name = "alchemist.mvc.print-request-info-if-business-error", havingValue = "true")
         static class BusinessCondition {
 

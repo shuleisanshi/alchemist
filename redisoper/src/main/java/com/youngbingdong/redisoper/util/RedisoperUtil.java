@@ -7,6 +7,8 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnection;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive;
+
 /**
  * @author ybd
  * @date 19-4-28
@@ -57,7 +59,7 @@ public class RedisoperUtil {
 		pipelineCallback.doPipelineCallback(connection);
 	}
 
-	public static void doNotThingPipeline(RedisConnection connection, PipelineCallback pipelineCallback) {
-		pipelineCallback.doPipelineCallback(connection);
-	}
+    public static boolean inTx() {
+        return isActualTransactionActive();
+    }
 }

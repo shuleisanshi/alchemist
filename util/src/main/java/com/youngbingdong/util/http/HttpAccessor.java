@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static com.alibaba.fastjson.JSON.parseObject;
 import static com.alibaba.fastjson.JSON.toJSONString;
 import static com.youngbingdong.util.http.ApiRequest.HTTP_METHOD_GET;
 
@@ -48,7 +49,7 @@ public class HttpAccessor {
     }
 
     @SuppressWarnings({"unchecked", "ConstantConditions"})
-    public static <R> R send(ApiRequest<R> apiRequest) {
+    public static <R> R access(ApiRequest<R> apiRequest) {
         try {
             OkHttpClient client = getOkHttpClient(apiRequest);
             Request okHttpRequest = createRequest(apiRequest);
@@ -58,9 +59,9 @@ public class HttpAccessor {
                 return (R) body;
             }
             if (JSONObject.class.equals(apiRequest.getRespClass())) {
-                return (R) JSONObject.parseObject(body);
+                return (R) parseObject(body);
             }
-            return JSONObject.parseObject(body, apiRequest.getRespClass());
+            return parseObject(body, apiRequest.getRespClass());
         } catch (IOException e) {
             throw new HttpAccessException(e);
         }

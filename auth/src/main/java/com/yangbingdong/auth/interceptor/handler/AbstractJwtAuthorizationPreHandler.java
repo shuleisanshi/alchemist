@@ -18,7 +18,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import static cn.hutool.core.util.StrUtil.isEmpty;
-import static com.yangbingdong.auth.AuthorizeConstant.REFRESH_INTERVAL_MILLI;
 import static com.yangbingdong.auth.AuthorizeConstant.REFRESH_TOKEN_LOCK_PREFIX;
 import static com.youngbingdong.util.jwt.AuthUtil.AUTHORIZATION_HEADER;
 import static com.youngbingdong.util.jwt.AuthUtil.parseAuthJwt;
@@ -53,18 +52,23 @@ public abstract class AbstractJwtAuthorizationPreHandler<T extends JwtPayload<T>
 
 	@Override
 	public void preHandleAuth(HttpServletRequest request, HttpServletResponse response, Method method) {
-        Jwt<T> jwt = checkAndGetJwtFromAuthHeader(request);
-		checkSessionExpire(jwt);
-		preHandle(AuthContext.of(request, response, method, jwt));
-		refreshJwtIfProximityTimeout(response, jwt);
+        preHandle(request, response, method);
 	}
+
+	protected void preHandle(HttpServletRequest request, HttpServletResponse response, Method method){
+        Jwt<T> jwt = checkAndGetJwtFromAuthHeader(request);
+        checkSessionExpire(jwt);
+        preHandle(AuthContext.of(request, response, method, jwt));
+        refreshJwtIfProximityTimeout(response, jwt);
+    }
+
 
 	private Jwt<T> checkAndGetJwtFromAuthHeader(HttpServletRequest request) {
 		String authorizationToken = request.getHeader(AUTHORIZATION_HEADER);
 		if(isEmpty(authorizationToken)) {
             throw new TokenException("Token could not be null");
         }
-        if (validTokenPrefix(authorizationToken)) {
+        if (!validTokenPrefix(authorizationToken)) {
             throw new TokenException("Invalid Token Prefix");
         }
 		return parseAuthJwt(authorizationToken, authProperty.getSignKey(), clazz);
@@ -83,7 +87,7 @@ public abstract class AbstractJwtAuthorizationPreHandler<T extends JwtPayload<T>
 	private void refreshJwtIfProximityTimeout(HttpServletResponse response, Jwt<? extends JwtPayload> jwt) {
         long expire = jwt.getJwtHeader().getExpire();
         long interval = expire - SystemTimer.now();
-		if (interval < REFRESH_INTERVAL_MILLI) {
+		if (interval < authProperty.getRefreshIntervalMilli()) {
 			Boolean nx = commonRedisoper.setNx(REFRESH_TOKEN_LOCK_PREFIX + jwt.getSign(), EMPTY, 600L);
 			if (nx) {
 				jwtOperator.grantAuthJwt(jwt.getPayload(), response);

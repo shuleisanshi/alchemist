@@ -39,7 +39,7 @@ public class RequestHolder {
         return StrUtil.EMPTY;
     }
 
-    public static Map<String, String> getAllHeader() {
+    public static Map<String, String> currentRequestHeader() {
         HttpServletRequest request = currentRequest();
         Map<String, String> map = new HashMap<>(16);
         Enumeration headerNames = request.getHeaderNames();

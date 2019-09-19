@@ -26,7 +26,7 @@ public class HttpAccessorTest {
                .header("Sec-Fetch-Mode", "cors")
                .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36");
 
-        JSONObject result = HttpAccessor.send(request);
+        JSONObject result = HttpAccessor.access(request);
         System.out.println(result);
     }
 }

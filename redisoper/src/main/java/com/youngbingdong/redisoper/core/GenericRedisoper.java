@@ -27,8 +27,6 @@ import java.util.function.Supplier;
 import static com.youngbingdong.util.Pager.of;
 import static java.util.Collections.emptyList;
 import static org.springframework.data.redis.core.ScanOptions.scanOptions;
-import static org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive;
-import static org.springframework.transaction.support.TransactionSynchronizationManager.isCurrentTransactionReadOnly;
 import static org.springframework.util.Assert.notNull;
 
 /**
@@ -256,7 +254,7 @@ public class GenericRedisoper<T> {
 				conn.set(rawPrimaryKey, rawValue(oldEntity));
 				allKeysToBeAdd.add(rawPrimaryKey);
 				conn.sAdd(rawKvSetKey, allKeysToBeAdd.toArray(new byte[allKeysToBeAdd.size()][]));
-				if (isActualTransactionActive() && !isCurrentTransactionReadOnly()) {
+				if (RedisoperUtil.inTx()) {
 					RedisTransactionResourceHolder.bindResource(primaryKey, oldEntity);
 				}
 			});

@@ -35,7 +35,7 @@ public class TencentLocator implements Locator {
         String realUrl = String.format(URL, address, key);
         String signMd5 = SecureUtil.md5(realUrl + sign);
         ApiRequest<JSONObject> request = newRequest(HOST + realUrl + "&sig=" + signMd5, JSONObject.class);
-        JSONObject json = HttpAccessor.send(request);
+        JSONObject json = HttpAccessor.access(request);
         Integer status = (Integer) json.getOrDefault("status", -1);
         if (status != 0) {
             log.error("获取失败 -> " + address);
