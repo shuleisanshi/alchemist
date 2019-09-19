@@ -1,18 +1,25 @@
 package com.youngbingdong.redisoper.extend.commom;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.springframework.data.redis.connection.RedisStringCommands.SetOption.SET_IF_ABSENT;
@@ -25,7 +32,7 @@ import static org.springframework.data.redis.core.types.Expiration.from;
  *
  * 只支持String
  */
-public class CommonRedisoper {
+public class CommonRedisoper implements InitializingBean {
 
 	private final RedisSerializer<String> stringSerializer = RedisSerializer.string();
 
@@ -37,6 +44,17 @@ public class CommonRedisoper {
 	@Autowired
 	@Qualifier("tranRedisTemplate")
 	private RedisTemplate<String, Object> tranRedisTemplate;
+
+    private RedisScript script;
+
+    @Override
+    public void afterPropertiesSet() {
+        DefaultRedisScript<Boolean> redisScript = new DefaultRedisScript<>();
+        redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("scripts/batch_expire.lua")));
+        redisScript.setResultType(Boolean.class);
+        script = redisScript;
+    }
+
 
 	/* ###################  KEY ################### */
 
@@ -103,6 +121,14 @@ public class CommonRedisoper {
 		});
 	}
 
+    /**
+     * 批量过期
+     */
+    public void mExpire(List<String> keys, Long expire) {
+        //noinspection unchecked
+        executeScript(script, keys, keys.size(), expire);
+    }
+
 	/* ################### String ################### */
 
 	public void set(String key, String value, long timeout) {
@@ -120,6 +146,17 @@ public class CommonRedisoper {
 			return null;
 		});
 	}
+
+    public void mSet(Map<String, String> tuple) {
+        redisTemplate.execute((RedisCallback<Void>) connection -> {
+            Map<byte[], byte[]> byteTuple = new HashMap<>(tuple.size());
+            tuple.forEach((k, v) -> {
+                byteTuple.put(rawString(k), rawString(v));
+            });
+            connection.mSet(byteTuple);
+            return null;
+        });
+    }
 
 	public Boolean setNx(String key, String value, long timeOut) {
 		return redisTemplate.execute((RedisCallback<Boolean>) connection -> connection.set(rawKey(key), rawValue(value), from(timeOut, SECONDS), SET_IF_ABSENT));
@@ -212,8 +249,12 @@ public class CommonRedisoper {
 
 	/* ################### Script ################### */
 
-	public <T> T executeScript(RedisScript<T> script, List<String> keys, Object... args) {
-		return redisTemplate.execute(script, stringSerializer, (RedisSerializer<T>) stringSerializer, keys, args);
+	@SuppressWarnings({"unchecked"})
+    public <T> T executeScript(RedisScript<T> script, List<String> keys, Object... args) {
+        args = Stream.of(args)
+                     .map(Object::toString)
+                     .toArray();
+        return redisTemplate.execute(script, stringSerializer, (RedisSerializer<T>) stringSerializer, keys, args);
 	}
 
 	/* ################### Serialize ################### */

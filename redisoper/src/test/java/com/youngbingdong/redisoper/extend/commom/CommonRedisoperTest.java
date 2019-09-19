@@ -1,5 +1,6 @@
 package com.youngbingdong.redisoper.extend.commom;
 
+import cn.hutool.core.util.StrUtil;
 import com.youngbingdong.redisoper.RedisoperApplicationTests;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Index;
@@ -8,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -196,6 +199,27 @@ public class CommonRedisoperTest extends RedisoperApplicationTests {
 		Assertions.assertThat(commonRedisoper.sMembers(key))
 				  .hasSize(49);
 	}
+
+    @Test
+    public void batchExpireTest() {
+        String key1 = "batchExpireTest1";
+        String key2 = "batchExpireTest2";
+        String key3 = "batchExpireTest3";
+
+        List<String> strings = Arrays.asList(key1, key2, key3);
+        Map<String, String> tuple = new HashMap<>();
+        for (String string : strings) {
+            tuple.put(string, StrUtil.EMPTY);
+        }
+        commonRedisoper.mSet(tuple);
+        commonRedisoper.mExpire(strings, 60L);
+
+        System.out.println(commonRedisoper.ttl(key1));
+        System.out.println(commonRedisoper.ttl(key2));
+
+        commonRedisoper.del(strings.toArray(new String[0]));
+        System.out.println(commonRedisoper.ttl(key1));
+    }
 
 
 }

@@ -5,7 +5,11 @@ import com.youngbingdong.redisoper.extend.dlock.AfterAcquireCommand;
 import com.youngbingdong.redisoper.extend.dlock.DLock;
 import com.youngbingdong.redisoper.extend.dlock.config.DLockProperty;
 import com.youngbingdong.util.time.SystemTimer;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.scripting.support.ResourceScriptSource;
 
 import javax.annotation.Resource;
 import java.util.UUID;
@@ -18,12 +22,11 @@ import static java.util.Collections.singletonList;
  * @date 19-5-16
  * @contact yangbingdong1994@gmail.com
  */
-public class SpringDataRedisDLock implements DLock {
+public class SpringDataRedisDLock implements DLock, InitializingBean {
 
 	@Resource
 	private CommonRedisoper commonRedisoper;
 
-	@Resource
 	private RedisScript<Boolean> script;
 
 	private Long defaultWaitSecond;
@@ -65,4 +68,12 @@ public class SpringDataRedisDLock implements DLock {
 			throw new IllegalStateException(e);
 		}
 	}
+
+    @Override
+    public void afterPropertiesSet() {
+        DefaultRedisScript<Boolean> redisScript = new DefaultRedisScript<>();
+        redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("scripts/release_lock.lua")));
+        redisScript.setResultType(Boolean.class);
+        script = redisScript;
+    }
 }

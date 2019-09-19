@@ -46,13 +46,6 @@ public class DLockProperty {
 	 */
 	private DLockType dLockType = DLockType.REDISSON;
 
-	private Spring spring = new Spring();
-
-	@Data
-	public static class Spring {
-		private String scriptLocation = "scripts/release_lock.lua";
-	}
-
 	@PostConstruct
 	public void init() {
 		this.host = redisProperties.getHost();
