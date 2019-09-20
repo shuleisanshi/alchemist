@@ -13,7 +13,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author yangbingdong
@@ -24,6 +24,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class TestUser implements Serializable {
 
+    /* !!!TUPLE_MARK_START!!! */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -54,7 +55,6 @@ public class TestUser implements Serializable {
 
     private Long testUk;
 
-
     public static final String ID = "id";
 
     public static final String NAME = "Name";
@@ -66,5 +66,9 @@ public class TestUser implements Serializable {
     public static final String DELETED = "deleted";
 
     public static final String TEST_UK = "test_uk";
+    /* !!TUPLE_MARK_END!!! */
 
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
 }
