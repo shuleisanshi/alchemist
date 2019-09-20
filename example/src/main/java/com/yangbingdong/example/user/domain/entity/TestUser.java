@@ -66,7 +66,7 @@ public class TestUser implements Serializable {
     public static final String DELETED = "deleted";
 
     public static final String TEST_UK = "test_uk";
-    /* !!TUPLE_MARK_END!!! */
+    /* !!!TUPLE_MARK_END!!! */
 
     public static void main(String[] args) {
         System.out.println("Hello World!");
