@@ -37,24 +37,23 @@ public class EntitySingleIndex<T> implements EntityIndex<T> {
 
 	@Override
 	public String genRedisIndexKeyByEntity(T entity) {
-		Object value = indexEntry.getReader().read(entity);
+		Object value = indexEntry.read(entity);
 		return getRedisIndexKeyInner(value);
 	}
 
 	@Override
 	public boolean indexChanged(T oldEntity, T newEntity) {
-		IndexReader<T> reader = indexEntry.getReader();
-		return !reader.read(oldEntity).equals(reader.read(newEntity));
+		return !indexEntry.read(oldEntity).equals(indexEntry.read(newEntity));
 	}
 
 	@Override
 	public Object getIndexValue(T entity) {
-		return indexEntry.getReader().read(entity);
+		return indexEntry.read(entity);
 	}
 
 	@Override
 	public void injectIndexValue(T entity, Object... values) {
-		indexEntry.getWriter().write(entity, values);
+		indexEntry.write(entity, values);
 	}
 
 	private String getRedisIndexKeyInner(Object value) {

@@ -3,6 +3,9 @@ package com.youngbingdong.redisoper.core.metadata.index;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * @author ybd
  * @date 19-3-23
@@ -20,7 +23,23 @@ public class EntityIndexEntry<T> {
 
 	private boolean unique = false;
 
-	private IndexReader<T> reader;
+    private Method readMethod;
 
-	private IndexWriter<T> writer;
+    private Method writeMethod;
+
+    public Object read(Object entity) {
+        try {
+            return readMethod.invoke(entity);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void write(Object entity, Object value) {
+        try {
+            writeMethod.invoke(entity, value);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

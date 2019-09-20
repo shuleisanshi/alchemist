@@ -1,5 +1,6 @@
 package com.youngbingdong.redisoper.core.beanprocessor;
 
+import com.youngbingdong.redisoper.core.GenericRedisoper;
 import com.youngbingdong.redisoper.core.RedisoperAware;
 import com.youngbingdong.redisoper.core.metadata.EntityMetadata;
 import com.youngbingdong.redisoper.core.metadata.annotation.RedisIndex;
@@ -8,11 +9,7 @@ import com.youngbingdong.redisoper.core.metadata.index.EntityIndex;
 import com.youngbingdong.redisoper.core.metadata.index.EntityIndexEntry;
 import com.youngbingdong.redisoper.core.metadata.index.EntitySingleIndex;
 import com.youngbingdong.redisoper.core.metadata.index.EntityUnionIndex;
-import com.youngbingdong.redisoper.core.metadata.index.IndexReader;
-import com.youngbingdong.redisoper.core.metadata.index.IndexWriter;
-import com.youngbingdong.redisoper.core.GenericRedisoper;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -21,13 +18,13 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.beans.BeanUtils.getPropertyDescriptor;
 
 /**
  * @author ybd
@@ -63,7 +60,7 @@ public abstract class AbstractBeanPostProcessor implements BeanPostProcessor, Ap
 				primaryKey.setIndexField(fieldName)
 						  .setIndexFieldCap(fieldNameCap)
 						  .setOrder(redisPrimaryKey.order());
-				handlerReaderAndWriter(primaryKey, entityClass, fieldName);
+				handlerReadMethodAndWriteMethod(primaryKey, entityClass, fieldName);
 				primaryKeyList.add(primaryKey);
 			}
 			if (declaredField.isAnnotationPresent(RedisIndex.class)) {
@@ -73,7 +70,7 @@ public abstract class AbstractBeanPostProcessor implements BeanPostProcessor, Ap
 						  .setOrder(redisIndex.order())
 						  .setIndexField(fieldName)
 						  .setIndexFieldCap(fieldNameCap);
-				handlerReaderAndWriter(indexEntry, entityClass, fieldName);
+				handlerReadMethodAndWriteMethod(indexEntry, entityClass, fieldName);
 				indexMap.compute(redisIndex.name(), (s, entityIndexEntries) -> {
 					if (entityIndexEntries == null || entityIndexEntries.size() == 0) {
 						List<EntityIndexEntry> indexEntries = new ArrayList<>(16);
@@ -149,34 +146,10 @@ public abstract class AbstractBeanPostProcessor implements BeanPostProcessor, Ap
 		}
 	}
 
-	@SuppressWarnings({"unchecked"})
-	private void handlerReaderAndWriter(EntityIndexEntry primaryKey, Class entityClass, String fieldName) {
-		primaryKey.setReader(buildIndexReader(entityClass, fieldName))
-				  .setWriter(buildIndexWriter(entityClass, fieldName));
-	}
-
-	@SuppressWarnings("ConstantConditions")
-	private IndexReader buildIndexReader(Class entityClass, String name) {
-		Method readMethod = BeanUtils.getPropertyDescriptor(entityClass, name).getReadMethod();
-		return (IndexReader<Object>) o -> {
-			try {
-				return readMethod.invoke(o);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				throw new RuntimeException(e);
-			}
-		};
-	}
-
-	@SuppressWarnings("ConstantConditions")
-	private IndexWriter buildIndexWriter(Class entityClass, String fieldName) {
-		Method writerMethod = BeanUtils.getPropertyDescriptor(entityClass, fieldName).getWriteMethod();
-		return (IndexWriter) (o, values) -> {
-			try {
-				writerMethod.invoke(o, values);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				throw new RuntimeException(e);
-			}
-		};
+    @SuppressWarnings("ConstantConditions")
+	private void handlerReadMethodAndWriteMethod(EntityIndexEntry primaryKey, Class entityClass, String fieldName) {
+		primaryKey.setReadMethod(getPropertyDescriptor(entityClass, fieldName).getReadMethod())
+				  .setWriteMethod(getPropertyDescriptor(entityClass, fieldName).getWriteMethod());
 	}
 
 	@Override

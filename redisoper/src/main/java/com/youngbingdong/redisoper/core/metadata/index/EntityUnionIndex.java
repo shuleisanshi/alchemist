@@ -63,14 +63,14 @@ public class EntityUnionIndex<T> implements EntityIndex<T> {
 		Object value;
 		if (primary) {
 			for (EntityIndexEntry<T> indexEntry : indexEntries) {
-				value = indexEntry.getReader().read(entity);
+				value = indexEntry.read(entity);
 				Assert.notNull(value, "Index value could not be null");
 				builder.append(EntityMetadata.SEMICOLON)
 					   .append(value);
 			}
 		} else {
 			for (EntityIndexEntry<T> indexEntry : indexEntries) {
-				value = indexEntry.getReader().read(entity);
+				value = indexEntry.read(entity);
 				Assert.notNull(value, "Index value could not be null");
 				builder.append(EntityMetadata.SEMICOLON)
 					   .append(indexEntry.getIndexFieldCap())
@@ -85,10 +85,8 @@ public class EntityUnionIndex<T> implements EntityIndex<T> {
 	@Override
 	public boolean indexChanged(T oldEntity, T newEntity) {
 		boolean changed = false;
-		IndexReader<T> reader;
 		for (EntityIndexEntry<T> indexEntry : indexEntries) {
-			reader = indexEntry.getReader();
-			if (!reader.read(oldEntity).equals(reader.read(newEntity))) {
+			if (!indexEntry.read(oldEntity).equals(indexEntry.read(newEntity))) {
 				changed = true;
 				break;
 			}
