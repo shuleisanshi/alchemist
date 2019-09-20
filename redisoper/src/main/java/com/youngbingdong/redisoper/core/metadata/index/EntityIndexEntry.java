@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
  */
 @Data
 @Accessors(chain = true)
-public class EntityIndexEntry<T> {
+public class EntityIndexEntry {
 
 	private String indexField;
 

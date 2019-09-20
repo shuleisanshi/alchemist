@@ -24,7 +24,7 @@ public class EntityUnionIndex<T> implements EntityIndex<T> {
 
 	private int size;
 
-	private EntityIndexEntry<T>[] indexEntries;
+	private EntityIndexEntry[] indexEntries;
 
 
 	@Override
@@ -62,14 +62,14 @@ public class EntityUnionIndex<T> implements EntityIndex<T> {
 		StringBuilder builder = resolveStringBuilder();
 		Object value;
 		if (primary) {
-			for (EntityIndexEntry<T> indexEntry : indexEntries) {
+			for (EntityIndexEntry indexEntry : indexEntries) {
 				value = indexEntry.read(entity);
 				Assert.notNull(value, "Index value could not be null");
 				builder.append(EntityMetadata.SEMICOLON)
 					   .append(value);
 			}
 		} else {
-			for (EntityIndexEntry<T> indexEntry : indexEntries) {
+			for (EntityIndexEntry indexEntry : indexEntries) {
 				value = indexEntry.read(entity);
 				Assert.notNull(value, "Index value could not be null");
 				builder.append(EntityMetadata.SEMICOLON)
@@ -85,7 +85,7 @@ public class EntityUnionIndex<T> implements EntityIndex<T> {
 	@Override
 	public boolean indexChanged(T oldEntity, T newEntity) {
 		boolean changed = false;
-		for (EntityIndexEntry<T> indexEntry : indexEntries) {
+		for (EntityIndexEntry indexEntry : indexEntries) {
 			if (!indexEntry.read(oldEntity).equals(indexEntry.read(newEntity))) {
 				changed = true;
 				break;

@@ -22,7 +22,7 @@ public class EntitySingleIndex<T> implements EntityIndex<T> {
 
 	private boolean unique;
 
-	private EntityIndexEntry<T> indexEntry;
+	private EntityIndexEntry indexEntry;
 
 	@Override
 	public boolean unique() {
