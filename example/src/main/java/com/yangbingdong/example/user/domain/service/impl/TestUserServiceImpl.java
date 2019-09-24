@@ -16,5 +16,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TestUserServiceImpl extends ServiceImpl<TestUserMapper, TestUser> implements TestUserService {
-
+    /* !!!TUPLE_MARK_START!!! */
+    /* !!!TUPLE_MARK_END!!! */
 }

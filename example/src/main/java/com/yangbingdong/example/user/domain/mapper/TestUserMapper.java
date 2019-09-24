@@ -14,5 +14,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface TestUserMapper extends CustomBaseMapper<TestUser> {
-
+    /* !!!TUPLE_MARK_START!!! */
+    /* !!!TUPLE_MARK_END!!! */
 }
