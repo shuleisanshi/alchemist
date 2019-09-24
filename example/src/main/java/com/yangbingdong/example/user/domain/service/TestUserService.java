@@ -12,5 +12,6 @@ import com.yangbingdong.service.core.Service;
  * @since 2019-09-09
  */
 public interface TestUserService extends Service<TestUser> {
-
+    /* !!!TUPLE_MARK_START!!! */
+    /* !!!TUPLE_MARK_END!!! */
 }
