@@ -40,7 +40,7 @@ public class ServiceImpl<M extends CustomBaseMapper<T>, T> implements Service<T>
     protected M baseMapper;
 
     private Class<T> entityClass;
-    private GenericRedisoper<T> redisoper;
+    protected GenericRedisoper<T> redisoper;
 
     @Override
     public M getBaseMapper() {

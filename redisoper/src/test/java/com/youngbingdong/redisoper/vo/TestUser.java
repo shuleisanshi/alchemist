@@ -5,9 +5,7 @@ import com.youngbingdong.redisoper.core.metadata.annotation.RedisPrimaryKey;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.annotation.Resource;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -23,16 +21,6 @@ public class TestUser implements Serializable {
 
 	public static final String NORMAL_IDX_NAME = "IDX_NAME";
 	public static final String UNIQUE_IDX_EMAIL = "UNIQUE_IDX_EMAIL";
-
-	public static void main(String[] args) {
-		Field[] fields = TestUser.class.getDeclaredFields();
-		for (Field field : fields) {
-			if (field.isAnnotationPresent(Resource.class)) {
-				Resource declaredAnnotation = field.getDeclaredAnnotation(Resource.class);
-			}
-			System.out.println(field.getName());
-		}
-	}
 
 	@RedisPrimaryKey
 	private Long id;
