@@ -249,6 +249,9 @@ public class CommonRedisoper implements InitializingBean {
 
 	/* ################### Script ################### */
 
+    /**
+     * Redis Cluster 模式下, 不允许不同 Slot 的 key 操作, 计算 Slot 请看 SlotHash#getSlot
+     */
 	@SuppressWarnings({"unchecked"})
     public <T> T executeScript(RedisScript<T> script, List<String> keys, Object... args) {
         args = Stream.of(args)
