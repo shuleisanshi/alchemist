@@ -124,7 +124,7 @@ public class CommonRedisoper implements InitializingBean {
     /**
      * 批量过期
      */
-    public void mExpire(List<String> keys, Long expire) {
+    public void mExpireByLua(List<String> keys, Long expire) {
         //noinspection unchecked
         executeScript(script, keys, keys.size(), expire);
     }

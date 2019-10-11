@@ -58,4 +58,15 @@ public class Pager<T> {
 	public static int calculateTotalPage(int total, int pageSize) {
 		return (total + pageSize - 1) / pageSize;
 	}
+
+    /**
+     * 计算当前分片分页, 比如分片总数为3, 当前分片序号为0, 那么第一次的分页为1, 第二次为4, 第三次为7, 以此类推
+     * @param shardingTotalCount 分片总数
+     * @param shardingItem 当前分片序号
+     * @param times 当前次数
+     * @return 当前分片页
+     */
+    public static int calculateCurrentPage(int shardingTotalCount, int shardingItem, int times) {
+        return shardingItem + 1 + shardingTotalCount * times;
+    }
 }

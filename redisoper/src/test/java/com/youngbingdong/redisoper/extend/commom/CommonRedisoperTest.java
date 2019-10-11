@@ -212,7 +212,7 @@ public class CommonRedisoperTest extends RedisoperApplicationTests {
             tuple.put(string, StrUtil.EMPTY);
         }
         commonRedisoper.mSet(tuple);
-        commonRedisoper.mExpire(strings, 60L);
+        commonRedisoper.mExpireByLua(strings, 60L);
 
         System.out.println(commonRedisoper.ttl(key1));
         System.out.println(commonRedisoper.ttl(key2));
