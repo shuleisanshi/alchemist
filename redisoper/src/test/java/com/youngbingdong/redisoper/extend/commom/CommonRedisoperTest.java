@@ -214,11 +214,34 @@ public class CommonRedisoperTest extends RedisoperApplicationTests {
         commonRedisoper.mSet(tuple);
         commonRedisoper.mExpireByLua(strings, 60L);
 
+        Assertions.assertThat(commonRedisoper.ttl(key1))
+                  .isNotNull()
+                  .isGreaterThan(-2);
+
         System.out.println(commonRedisoper.ttl(key1));
         System.out.println(commonRedisoper.ttl(key2));
 
         commonRedisoper.del(strings.toArray(new String[0]));
         System.out.println(commonRedisoper.ttl(key1));
+    }
+
+    @Test
+    public void lRangeAndTrimTest() {
+        String key = "lRangeAndTrimTest";
+        try {
+            for (int i = 0; i < 10; i++) {
+                commonRedisoper.lPush(key, String.valueOf(i));
+            }
+            List<String> lRange = commonRedisoper.lRange(key, 0, 4);
+            System.out.println(Arrays.toString(lRange.toArray()));
+
+            commonRedisoper.lRangeAndTrim(key, 0, 4);
+            lRange = commonRedisoper.lRange(key, 0, 4);
+            Assertions.assertThat(lRange.size())
+                      .isEqualTo(5);
+        } finally {
+            commonRedisoper.del(key);
+        }
     }
 
 

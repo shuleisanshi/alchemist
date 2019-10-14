@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.springframework.data.redis.connection.RedisStringCommands.SetOption.SET_IF_ABSENT;
 import static org.springframework.data.redis.core.types.Expiration.from;
@@ -45,14 +46,18 @@ public class CommonRedisoper implements InitializingBean {
 	@Qualifier("tranRedisTemplate")
 	private RedisTemplate<String, Object> tranRedisTemplate;
 
-    private RedisScript script;
+    private DefaultRedisScript<Boolean> batchExpireScript;
+    private DefaultRedisScript<List> lRangeAndTrimScript;
 
     @Override
     public void afterPropertiesSet() {
-        DefaultRedisScript<Boolean> redisScript = new DefaultRedisScript<>();
-        redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("scripts/batch_expire.lua")));
-        redisScript.setResultType(Boolean.class);
-        script = redisScript;
+        batchExpireScript = new DefaultRedisScript<>();
+        batchExpireScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("scripts/batch_expire.lua")));
+        batchExpireScript.setResultType(Boolean.class);
+
+        lRangeAndTrimScript = new DefaultRedisScript<>();
+        lRangeAndTrimScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("scripts/lrange_trim.lua")));
+        lRangeAndTrimScript.setResultType(List.class);
     }
 
 
@@ -126,7 +131,7 @@ public class CommonRedisoper implements InitializingBean {
      */
     public void mExpireByLua(List<String> keys, Long expire) {
         //noinspection unchecked
-        executeScript(script, keys, keys.size(), expire);
+        executeScript(batchExpireScript, keys, keys.size(), expire);
     }
 
 	/* ################### String ################### */
@@ -218,6 +223,11 @@ public class CommonRedisoper implements InitializingBean {
 			return null;
 		});
 	}
+
+    @SuppressWarnings("unchecked")
+    public List<String> lRangeAndTrim(String key, int start, int end) {
+        return executeScript(lRangeAndTrimScript, singletonList(key), String.valueOf(start), String.valueOf(end));
+    }
 
 	/* ################### SET ################### */
 
