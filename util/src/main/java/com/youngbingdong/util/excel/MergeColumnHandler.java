@@ -41,8 +41,8 @@ public class MergeColumnHandler implements CellWriteHandler, RowWriteHandler, Sh
     private Map<String, List<String>> sameAsMergeMap = new HashMap<>(16);
     private Map<String, Integer> headerColumnIndex = new HashMap<>(16);
     private Map<String, List<Integer>> sameAsMergeColumnIndexMap = new HashMap<>(16);
-    private int flag;
-    private int size;
+    private int needMergeColumnIndexFlag;
+    private int dataFlowSizeAccumulator;
     private Map<String, Object[]> needMergeValueAndIndexPair = new HashMap<>(16);
 
     private final int totalSize;
@@ -57,7 +57,7 @@ public class MergeColumnHandler implements CellWriteHandler, RowWriteHandler, Sh
         if (isHead) {
             headerColumnIndex.put(header, head.getColumnIndex());
             if (mergeColumnRegister.contains(header)) {
-                flag |= 1 << head.getColumnIndex();
+                needMergeColumnIndexFlag |= 1 << head.getColumnIndex();
             }
             headSize++;
             if (writeSheetHolder.getExcelWriteHeadProperty().getHeadMap().size() == headSize) {
@@ -76,7 +76,7 @@ public class MergeColumnHandler implements CellWriteHandler, RowWriteHandler, Sh
             return;
         }
         int index = 1 << head.getColumnIndex();
-        if ((flag & index) == index) {
+        if ((needMergeColumnIndexFlag & index) == index) {
             Object[] pair = needMergeValueAndIndexPair.get(header);
             int currentRowIndex = cell.getRowIndex();
             String currentRwoValue = cellData.getStringValue();
@@ -84,7 +84,7 @@ public class MergeColumnHandler implements CellWriteHandler, RowWriteHandler, Sh
                 String value = (String) pair[0];
                 Integer startMergeRow = (Integer) pair[1];
                 if (value.equals(currentRwoValue)) {
-                    if (totalSize == size) {
+                    if (totalSize == dataFlowSizeAccumulator) {
                         merge(writeSheetHolder, cell, startMergeRow, currentRowIndex, true, header);
                     }
                 } else {
@@ -117,7 +117,7 @@ public class MergeColumnHandler implements CellWriteHandler, RowWriteHandler, Sh
         if (isHead) {
             return;
         }
-        size++;
+        dataFlowSizeAccumulator++;
     }
 
     @Override
