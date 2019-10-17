@@ -3,6 +3,7 @@ package com.youngbingdong.util.perf.excel.merge;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
+import com.youngbingdong.util.excel.ExcelUtil;
 import com.youngbingdong.util.excel.MergeColumnHandler;
 import com.youngbingdong.util.perf.excel.DemoData;
 import com.youngbingdong.util.perf.excel.TestFileUtil;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author ybd
@@ -27,7 +29,31 @@ public class WriteMergeTest {
         excelWriter.write(data1(), writeSheet);
         excelWriter.write(data2(), writeSheet);
         excelWriter.finish();
+    }
 
+    @Test
+    public void exportMerge() {
+        String fileName = TestFileUtil.getPath() + "writeMerge" + System.currentTimeMillis() + ".xlsx";
+        List<DemoData> list = data1();
+        list.addAll(data2());
+        ExcelUtil.export(fileName, list);
+    }
+
+    @Test
+    public void exportMergeByDataFlow() {
+        String fileName = TestFileUtil.getPath() + "writeMerge" + System.currentTimeMillis() + ".xlsx";
+        AtomicInteger page = new AtomicInteger(0);
+        ExcelUtil.exportByDataFlow(fileName, 20, () -> getByPage(page.incrementAndGet()));
+    }
+
+    private List<?> getByPage(int page) {
+        if (page == 1) {
+            return data1();
+        }
+        if (page == 2) {
+            return data2();
+        }
+        return null;
     }
 
     private List<DemoData> data1() {
