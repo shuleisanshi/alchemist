@@ -35,9 +35,9 @@ public class EntityIndexEntry {
         }
     }
 
-    public void write(Object entity, Object value) {
+    public void write(Object entity, Object... values) {
         try {
-            writeMethod.invoke(entity, value);
+            writeMethod.invoke(entity, values);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
