@@ -21,7 +21,7 @@ public class BeanUtilTest {
 
 		TestUser newUser = new TestUser().setName("yangbingdong");
 
-		BeanUtil.copyPropertiesIgnoreNull(newUser, oldUser);
+		BeanUtil.copyPropertiesWithSameClass(newUser, oldUser);
 
 		Assertions.assertThat(oldUser.getName())
 				  .isEqualTo("yangbingdong");
@@ -35,7 +35,7 @@ public class BeanUtilTest {
 		TestUser oldUser = new TestUser().setName("ybd");
 		TestOtherUser testOtherUser = new TestOtherUser().setName("yangbingdong");
 
-		Assertions.assertThatThrownBy(() -> BeanUtil.copyPropertiesIgnoreNull(testOtherUser, oldUser))
+		Assertions.assertThatThrownBy(() -> BeanUtil.copyPropertiesWithSameClass(testOtherUser, oldUser))
 				  .isInstanceOf(IllegalArgumentException.class)
 				  .hasMessage("Not support different class");
 	}

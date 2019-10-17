@@ -13,7 +13,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 /**
  * @author iba
  */
-public final class DateUtils {
+public final class DateUtil {
 
     /**
      * 默认日期格式，带日期和时间yyyy-MM-dd HH:mm:ss
@@ -63,7 +63,7 @@ public final class DateUtils {
     public static final String CRON_FORMAT = "ss mm HH dd MM ? yyyy";
     public static final String DEFAULT_NO_SECOND_FROMAT = "yyyy-MM-dd HH:mm";
 
-    private DateUtils() {
+    private DateUtil() {
     }
 
     /**

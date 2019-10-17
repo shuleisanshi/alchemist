@@ -1,5 +1,6 @@
 package com.youngbingdong.util.perf.excel;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.format.NumberFormat;
@@ -16,7 +17,9 @@ import java.util.Date;
 @Data
 public class DemoData {
 
-    @MergeColumn(sameAs = {"数字标题"})
+    public static final String DOUBEL_DATA_HEAD = "数字标题";
+
+    @MergeColumn(sameAs = {DOUBEL_DATA_HEAD})
     @ExcelProperty("字符串标题")
     private String string;
 
@@ -25,8 +28,9 @@ public class DemoData {
     @ExcelProperty("日期标题")
     private Date date;
 
+    @ExcelIgnore
     @NumberFormat("#.##%")
-    @ExcelProperty("数字标题")
+    @ExcelProperty(DOUBEL_DATA_HEAD)
     private Double doubleData;
 
 }

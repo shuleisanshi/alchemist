@@ -250,7 +250,7 @@ public class GenericRedisoper<T> {
 						}
 					});
 				}
-				BeanUtil.copyPropertiesIgnoreNull(newEntity, oldEntity);
+				BeanUtil.copyPropertiesWithSameClass(newEntity, oldEntity);
 				conn.set(rawPrimaryKey, rawValue(oldEntity));
 				allKeysToBeAdd.add(rawPrimaryKey);
 				conn.sAdd(rawKvSetKey, allKeysToBeAdd.toArray(new byte[allKeysToBeAdd.size()][]));

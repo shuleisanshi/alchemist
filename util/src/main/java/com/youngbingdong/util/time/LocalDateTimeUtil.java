@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * @author iba
  */
-public final class LocalDateTimeUtils {
+public final class LocalDateTimeUtil {
 
     /**
      * 日期格式yyyy-MM-dd
@@ -25,7 +25,7 @@ public final class LocalDateTimeUtils {
     /**
      * 构造函数
      */
-    private LocalDateTimeUtils() {
+    private LocalDateTimeUtil() {
         super();
     }
 

@@ -2,6 +2,7 @@ package com.youngbingdong.util.http;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Callback;
 import okhttp3.Dispatcher;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -9,6 +10,7 @@ import okhttp3.OkHttpClient.Builder;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -48,13 +50,17 @@ public class HttpAccessor {
         return okHttpClient;
     }
 
-    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    @SuppressWarnings({"unchecked"})
     public static <R> R access(ApiRequest<R> apiRequest) {
         try {
             OkHttpClient client = getOkHttpClient(apiRequest);
             Request okHttpRequest = createRequest(apiRequest);
             Response response = client.newCall(okHttpRequest).execute();
-            String body = response.body().string();
+            ResponseBody respBody = response.body();
+            if (respBody == null) {
+                throw new IllegalStateException("ResponseBody is missing");
+            }
+            String body = respBody.string();
             if (String.class.equals(apiRequest.getRespClass())) {
                 return (R) body;
             }
@@ -67,7 +73,14 @@ public class HttpAccessor {
         }
     }
 
-    private static <R> OkHttpClient getOkHttpClient(ApiRequest<R> apiRequest) {
+    @SuppressWarnings("unchecked")
+    public static void access(ApiRequest apiRequest, Callback responseCallback) {
+        OkHttpClient client = getOkHttpClient(apiRequest);
+        Request okHttpRequest = createRequest(apiRequest);
+        client.newCall(okHttpRequest).enqueue(responseCallback);
+    }
+
+    private static OkHttpClient getOkHttpClient(ApiRequest apiRequest) {
         if (DEFAULT_TIMEOUT < apiRequest.getTimeout()) {
             return okHttpClient.newBuilder()
                                .readTimeout(apiRequest.getTimeout(), TimeUnit.SECONDS)
@@ -120,7 +133,7 @@ public class HttpAccessor {
     /**
      * Setting testMode configuration. If set as testMode, the connection will skip certification check
      */
-    public static Builder configureToIgnoreCertificate(Builder builder) {
+    private static Builder configureToIgnoreCertificate(Builder builder) {
         try {
             /*Create a trust manager that does not validate certificate chains*/
             final TrustManager[] trustAllCerts = new TrustManager[]{
