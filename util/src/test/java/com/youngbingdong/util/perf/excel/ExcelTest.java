@@ -3,6 +3,7 @@ package com.youngbingdong.util.perf.excel;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
+import com.youngbingdong.util.excel.ExcelUtil;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.List;
  * @date 2019/10/15
  * @contact yangbingdong1994@gmail.com
  */
-public class WriteTest {
+public class ExcelTest {
 
     @Test
     public void simpleWrite() {
@@ -78,6 +79,27 @@ public class WriteTest {
         List<DemoData> data = data();
         excelWriter.write(data, writeSheet);
         excelWriter.finish();
+    }
+
+    @Test
+    public void writeAndRead() throws InterruptedException {
+        String fileName = TestFileUtil.getPath() + "writeAndRead" + System.currentTimeMillis() + ".xlsx";
+        List<DemoData> data = data();
+        DemoData demoData9 = data.get(9);
+        DemoData demoData10 = new DemoData();
+        demoData10.setDate(demoData9.getDate());
+        demoData10.setDoubleData(demoData9.getDoubleData());
+        demoData10.setString(demoData9.getString());
+        data.add(demoData10);
+        ExcelUtil.write(fileName, data);
+        Thread.sleep(1000L);
+        ExcelUtil.read(fileName, new DemoDataListener());
+    }
+
+    @Test
+    public void readTest() {
+        String fileName = TestFileUtil.getPath() + "writeAndRead1571393229950.xlsx";
+        ExcelUtil.read(fileName, new DemoDataListener());
     }
 
     private List<DemoData> data() {

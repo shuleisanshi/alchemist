@@ -1,14 +1,13 @@
 package com.youngbingdong.util.time;
 
-import org.apache.commons.lang3.time.FastDateFormat;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static cn.hutool.core.date.format.FastDateFormat.getInstance;
+import static cn.hutool.core.util.StrUtil.isBlank;
 
 /**
  * @author iba
@@ -191,7 +190,7 @@ public final class DateUtil {
      * @return
      */
     public static Date getStrDateByDefault(String date) {
-        if (isEmpty(date)) {
+        if (isBlank(date)) {
             return null;
         }
         return getStrDate(DEFAUL_FORMAT, date);
@@ -204,7 +203,7 @@ public final class DateUtil {
      * @return
      */
     public static Date getStrDateNoTime(String date) {
-        if (isEmpty(date)) {
+        if (isBlank(date)) {
             return null;
         }
         return getStrDate(DEFAULT_NO_TIME_FROMAT, date);
@@ -761,7 +760,7 @@ public final class DateUtil {
     }
 
     public static String parseToCron(Date date) {
-        return FastDateFormat.getInstance(CRON_FORMAT).format(date);
+        return getInstance(CRON_FORMAT).format(date);
     }
 
     /**

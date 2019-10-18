@@ -1,5 +1,6 @@
 package com.youngbingdong.redisoper.core.beanprocessor;
 
+import cn.hutool.core.util.StrUtil;
 import com.youngbingdong.redisoper.core.GenericRedisoper;
 import com.youngbingdong.redisoper.core.RedisoperAware;
 import com.youngbingdong.redisoper.core.metadata.EntityMetadata;
@@ -9,7 +10,6 @@ import com.youngbingdong.redisoper.core.metadata.index.EntityIndex;
 import com.youngbingdong.redisoper.core.metadata.index.EntityIndexEntry;
 import com.youngbingdong.redisoper.core.metadata.index.EntitySingleIndex;
 import com.youngbingdong.redisoper.core.metadata.index.EntityUnionIndex;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -53,7 +53,7 @@ public abstract class AbstractBeanPostProcessor implements BeanPostProcessor, Ap
 
 		for (Field declaredField : entityClass.getDeclaredFields()) {
 			String fieldName = declaredField.getName();
-			String fieldNameCap = StringUtils.capitalize(fieldName);
+			String fieldNameCap = StrUtil.upperFirst(fieldName);
 			if (declaredField.isAnnotationPresent(RedisPrimaryKey.class)) {
 				RedisPrimaryKey redisPrimaryKey = declaredField.getAnnotation(RedisPrimaryKey.class);
 				EntityIndexEntry primaryKey = new EntityIndexEntry();

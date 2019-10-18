@@ -1,6 +1,6 @@
 package com.youngbingdong.util.spring;
 
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
 
 import static org.springframework.boot.context.config.ConfigFileApplicationListener.INCLUDE_PROFILES_PROPERTY;
 
@@ -13,7 +13,7 @@ public class SystemProfileAppender {
 
 	public static void appendProfile(String profile) {
 		String property = System.getProperty(INCLUDE_PROFILES_PROPERTY);
-		if (StringUtils.isBlank(property)) {
+		if (StrUtil.isBlank(property)) {
 			property = profile;
 		} else {
 			property = property + "," + profile;

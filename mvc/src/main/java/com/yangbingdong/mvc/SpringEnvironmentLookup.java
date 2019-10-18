@@ -16,10 +16,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static cn.hutool.core.util.StrUtil.isBlank;
+import static cn.hutool.core.util.StrUtil.isNotBlank;
 import static com.yangbingdong.mvc.SpringEnvironmentLookup.LOOK_UP_PREFIX;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * @author ybd

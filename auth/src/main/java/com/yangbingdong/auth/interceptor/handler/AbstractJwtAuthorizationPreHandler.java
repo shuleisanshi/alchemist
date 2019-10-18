@@ -17,12 +17,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import static cn.hutool.core.util.StrUtil.EMPTY;
 import static cn.hutool.core.util.StrUtil.isEmpty;
 import static com.yangbingdong.auth.AuthorizeConstant.REFRESH_TOKEN_LOCK_PREFIX;
 import static com.youngbingdong.util.jwt.AuthUtil.AUTHORIZATION_HEADER;
 import static com.youngbingdong.util.jwt.AuthUtil.parseAuthJwt;
 import static com.youngbingdong.util.jwt.AuthUtil.validTokenPrefix;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * @author ybd

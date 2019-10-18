@@ -1,5 +1,6 @@
 package com.yangbingdong.mvc.disruptor;
 
+import cn.hutool.core.thread.ThreadFactoryBuilder;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.ExceptionHandler;
@@ -7,8 +8,8 @@ import com.lmax.disruptor.TimeoutException;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,13 +20,13 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public final class DisruptorUtil {
 
-    public static BasicThreadFactory getThreadFactory(String pattern) {
-        return new BasicThreadFactory.Builder().namingPattern(pattern)
-											   .build();
+    private static ThreadFactory getThreadFactory() {
+        return ThreadFactoryBuilder.create().setNamePrefix("disruptor-")
+                                   .build();
     }
 
     public static <T> Disruptor<T> createDisruptor(EventFactory<T> eventFactory, int bufferSize) {
-        Disruptor<T> disruptor = new Disruptor<>(eventFactory, bufferSize, getThreadFactory("disruptor-%d"), ProducerType.MULTI, new BlockingWaitStrategy());
+        Disruptor<T> disruptor = new Disruptor<>(eventFactory, bufferSize, getThreadFactory(), ProducerType.MULTI, new BlockingWaitStrategy());
         disruptor.setDefaultExceptionHandler(new DefaultDisruptorExceptionHandler<>());
         return disruptor;
     }

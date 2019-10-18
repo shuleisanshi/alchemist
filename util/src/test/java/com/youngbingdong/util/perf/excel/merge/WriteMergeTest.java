@@ -33,17 +33,17 @@ public class WriteMergeTest {
 
     @Test
     public void exportMerge() {
-        String fileName = TestFileUtil.getPath() + "writeMerge" + System.currentTimeMillis() + ".xlsx";
+        String fullFilePath = TestFileUtil.getPath() + "writeMerge" + System.currentTimeMillis() + ".xlsx";
         List<DemoData> list = data1();
         list.addAll(data2());
-        ExcelUtil.export(fileName, list);
+        ExcelUtil.write(fullFilePath, list);
     }
 
     @Test
     public void exportMergeByDataFlow() {
         String fileName = TestFileUtil.getPath() + "writeMerge" + System.currentTimeMillis() + ".xlsx";
         AtomicInteger page = new AtomicInteger(0);
-        ExcelUtil.exportByDataFlow(fileName, 20, () -> getByPage(page.incrementAndGet()));
+        ExcelUtil.writeByDataFlow(fileName, 20, () -> getByPage(page.incrementAndGet()));
     }
 
     private List<?> getByPage(int page) {

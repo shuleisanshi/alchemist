@@ -22,4 +22,12 @@ public class TypeUtil {
 		}
 		return null;
 	}
+
+    public static Class<?> getClassFromGenericSupperClass(Class<?> clazz) {
+        Type genericSuperclass = clazz.getGenericSuperclass();
+        if (genericSuperclass instanceof ParameterizedType) {
+            return (Class<?>) ((ParameterizedType) genericSuperclass).getActualTypeArguments()[0];
+        }
+        return getClassFromGenericSupperClass((Class<?>) genericSuperclass);
+    }
 }

@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 
 /**
  * @author ybd

@@ -15,8 +15,10 @@ import java.util.Date;
  *
  **/
 @Data
+// @Accessors(chain = true)
 public class DemoData {
 
+    @ExcelIgnore
     public static final String DOUBEL_DATA_HEAD = "数字标题";
 
     @MergeColumn(sameAs = {DOUBEL_DATA_HEAD})
@@ -28,7 +30,6 @@ public class DemoData {
     @ExcelProperty("日期标题")
     private Date date;
 
-    @ExcelIgnore
     @NumberFormat("#.##%")
     @ExcelProperty(DOUBEL_DATA_HEAD)
     private Double doubleData;

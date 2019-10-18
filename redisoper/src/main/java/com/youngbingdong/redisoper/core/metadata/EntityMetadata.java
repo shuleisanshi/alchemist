@@ -3,7 +3,6 @@ package com.youngbingdong.redisoper.core.metadata;
 import com.youngbingdong.redisoper.core.metadata.index.EntityIndex;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class EntityMetadata<T> {
 
 	public EntityMetadata(Class<T> entityClass) {
 		this.entityClass = entityClass;
-		entityName = StringUtils.capitalize(entityClass.getSimpleName());
+		entityName = entityClass.getSimpleName();
 	}
 
 	public void setIndexMap(Map<String, EntityIndex<T>> indexMap) {
@@ -72,4 +71,5 @@ public class EntityMetadata<T> {
 	public void injectPrimaryValue(T entity, Object value) {
 		entityPrimaryKey.injectIndexValue(entity, value);
 	}
+
 }

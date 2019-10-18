@@ -88,9 +88,13 @@ public class MergeColumnHandler implements CellWriteHandler, RowWriteHandler, Sh
                         merge(writeSheetHolder, cell, startMergeRow, currentRowIndex, true, header);
                     }
                 } else {
-                    merge(writeSheetHolder, cell, startMergeRow, currentRowIndex, false, header);
                     pair[0] = currentRwoValue;
                     pair[1] = currentRowIndex;
+                    if (startMergeRow + 1 == currentRowIndex) {
+                        return;
+                    }
+                    merge(writeSheetHolder, cell, startMergeRow, currentRowIndex, false, header);
+
                 }
             } else {
                 Object[] array = new Object[]{currentRwoValue, currentRowIndex};
