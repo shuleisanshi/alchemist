@@ -7,6 +7,7 @@ import com.youngbingdong.util.excel.ExcelUtil;
 import com.youngbingdong.util.excel.MergeColumnHandler;
 import com.youngbingdong.util.perf.excel.DemoData;
 import com.youngbingdong.util.perf.excel.TestFileUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2019/10/16
  * @contact yangbingdong1994@gmail.com
  */
+@Ignore
 public class WriteMergeTest {
 
     @Test

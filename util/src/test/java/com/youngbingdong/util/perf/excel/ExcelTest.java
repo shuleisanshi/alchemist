@@ -4,6 +4,7 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.youngbingdong.util.excel.ExcelUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
  * @date 2019/10/15
  * @contact yangbingdong1994@gmail.com
  */
+@Ignore
 public class ExcelTest {
 
     @Test
