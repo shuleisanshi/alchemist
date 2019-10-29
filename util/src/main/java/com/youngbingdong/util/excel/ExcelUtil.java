@@ -1,12 +1,12 @@
 package com.youngbingdong.util.excel;
 
+import cn.hutool.core.codec.Base64;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.youngbingdong.util.spring.RequestHolder;
 import org.springframework.web.multipart.MultipartFile;
-import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -69,9 +69,8 @@ public class ExcelUtil {
     private static String fileNameEncoding(String fileName) throws IOException {
         String agent = RequestHolder.currentRequest().getHeader("User-Agent");
         if (agent.contains("Firefox")) {
-            BASE64Encoder base64Encoder = new BASE64Encoder();
             fileName = "=?utf-8?B?"
-                    + base64Encoder.encode(fileName.getBytes(StandardCharsets.UTF_8)) + "?=";
+                    + Base64.encode(fileName.getBytes(StandardCharsets.UTF_8)) + "?=";
         } else {
             fileName = URLEncoder.encode(fileName, "utf-8");
         }
